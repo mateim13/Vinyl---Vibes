@@ -56,16 +56,14 @@ namespace vinyl
         {
             string numeAfisat = string.IsNullOrEmpty(Titlu) ? "VINYL NESETAT" : Titlu;
             string stare = EsteImpumutat ? "[Imprumutat la " + NumeImprumutat + "]" : "[In raft]";
-            string detalii = Artist + " - " + numeAfisat + " (" + An_Lansare + ")";
+            string detalii = Artist + " - " + numeAfisat + " (" + An_Lansare + ")" + stare;
 
             string tracklist = "\nTracklist:";
-            if (Melodii != null && Melodii.Length > 0) 
+            if (Melodii != null && Melodii.Length > 0)
             {
-                int contor = 1;
-                foreach (string piesa in Melodii) 
+                for (int i = 0; i < Melodii.Length; i++)
                 {
-                    tracklist += "\n  " + contor + ". " + piesa;
-                    contor++;
+                    tracklist += $"\n {i + 1}. {Melodii[i]}";
                 }
             }
             else
@@ -74,26 +72,8 @@ namespace vinyl
             }
 
             return  "\n" + detalii + "\nSnippet: " + (string.IsNullOrEmpty(CaleAudioSnippet) ? "Fara audio" : CaleAudioSnippet) +
-                    "\nConditie: " + ConditieDisc + tracklist;
+                    "\nConditie: " + ConditieDisc + tracklist + "\n--------------------------";
 
         }
-
-        public void Tracklist(string listaMelodii)
-        {
-            if (!string.IsNullOrEmpty(listaMelodii))
-            {
-                Melodii = listaMelodii.Split(',');
-
-                for (int i = 0; i < Melodii.Length; i++)
-                {
-                    Melodii[i] = Melodii[i].Trim();
-                }
-            }
-        }
-
-        
-
-
-
     }
 }

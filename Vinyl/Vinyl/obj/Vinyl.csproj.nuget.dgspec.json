@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\PIU\\PROIECT PIU\\Vinyl\\Vinyl\\Vinyl.csproj": {}
+    "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\Vinyl.csproj": {}
   },
   "projects": {
-    "E:\\PIU\\PROIECT PIU\\Vinyl\\Vinyl\\Vinyl.csproj": {
+    "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\Vinyl.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\PIU\\PROIECT PIU\\Vinyl\\Vinyl\\Vinyl.csproj",
+        "projectUniqueName": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\Vinyl.csproj",
         "projectName": "Vinyl",
-        "projectPath": "E:\\PIU\\PROIECT PIU\\Vinyl\\Vinyl\\Vinyl.csproj",
+        "projectPath": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\Vinyl.csproj",
         "packagesPath": "C:\\Users\\matei\\.nuget\\packages\\",
-        "outputPath": "E:\\PIU\\PROIECT PIU\\Vinyl\\Vinyl\\obj\\",
+        "outputPath": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "E:\\VS\\Shared Comp\\NuGetPackages"
