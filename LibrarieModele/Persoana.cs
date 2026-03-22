@@ -2,17 +2,76 @@ using System;
 
 namespace LibrarieModele
 {
+    public enum RolPersoana
+    {
+        Colectionar,    
+        Imprumutator,   
+        Vanzator,       
+        Cumparator      
+    }
+
+    public enum StareMembru
+    {
+        Activ,    
+        Inactiv,  
+        VIP         
+    }
+
     public class Persoana
     {
         public string Nume { get; set; }
         public string Contact { get; set; }
         public string[] DiscuriImprumutate { get; set; }
+        public RolPersoana Rol { get; set; }
+        public StareMembru Stare { get; set; }
+
+        public int LimitaImprumut
+        {
+            get
+            {
+                switch (Stare)
+                {
+                    case StareMembru.VIP:    return int.MaxValue; 
+                    case StareMembru.Activ:  return 3;
+                    default:                 return 0;            
+                }
+            }
+        }
 
         public Persoana(string nume, string contact)
         {
             Nume = nume;
             Contact = contact;
             DiscuriImprumutate = new string[0];
+            Rol = RolPersoana.Colectionar;
+            Stare = StareMembru.Activ;
+        }
+
+        public Persoana(string nume, string contact, RolPersoana rol, StareMembru stare)
+        {
+            Nume = nume;
+            Contact = contact;
+            DiscuriImprumutate = new string[0];
+            Rol = rol;
+            Stare = stare;
+        }
+
+        public bool PoateImprumuta(int discuriCurente, out string motiv)
+        {
+            if (Stare == StareMembru.Inactiv)
+            {
+                motiv = $"{Nume} este inactiv si nu poate imprumuta discuri.";
+                return false;
+            }
+
+            if (Stare == StareMembru.Activ && discuriCurente >= 3)
+            {
+                motiv = $"{Nume} (Activ) a atins limita de 3 discuri imprumutate simultan.";
+                return false;
+            }
+
+            motiv = string.Empty;
+            return true;
         }
 
         public string InfoPersoana()
@@ -21,7 +80,12 @@ namespace LibrarieModele
                 ? string.Join(", ", DiscuriImprumutate)
                 : "Niciun disc momentan";
 
-            return "Persoana: " + Nume + " | Contact: " + Contact + "\nAre imprumutate: " + lista;
+            string limitaStr = Stare == StareMembru.VIP ? "nelimitata" : LimitaImprumut.ToString();
+
+            return "Persoana: " + Nume + " | Contact: " + Contact +
+                   " | Rol: " + Rol + " | Stare: " + Stare +
+                   " | Limita imprumut: " + limitaStr +
+                   "\nAre imprumutate: " + lista;
         }
     }
 }
