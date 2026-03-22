@@ -3,16 +3,28 @@
   "WorkspaceRootPath": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{88686ECF-415F-2C9D-9309-B00AD2F61324}|Vinyl\\Vinyl.csproj|e:\\piu\\git desktop repos\\vinyl---vibes\\vinyl\\vinyl\\vinyl.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{88686ECF-415F-2C9D-9309-B00AD2F61324}|Vinyl\\Vinyl.csproj|solutionrelative:vinyl\\vinyl.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{88686ECF-415F-2C9D-9309-B00AD2F61324}|Vinyl\\Vinyl.csproj|e:\\piu\\git desktop repos\\vinyl---vibes\\vinyl\\vinyl\\models\\persoana.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{88686ECF-415F-2C9D-9309-B00AD2F61324}|Vinyl\\Vinyl.csproj|solutionrelative:vinyl\\models\\persoana.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{88686ECF-415F-2C9D-9309-B00AD2F61324}|Vinyl\\Vinyl.csproj|e:\\piu\\git desktop repos\\vinyl---vibes\\vinyl\\vinyl\\models\\vinyl.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{88686ECF-415F-2C9D-9309-B00AD2F61324}|Vinyl\\Vinyl.csproj|solutionrelative:vinyl\\models\\vinyl.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{88686ECF-415F-2C9D-9309-B00AD2F61324}|Vinyl\\Vinyl.csproj|e:\\piu\\git desktop repos\\vinyl---vibes\\vinyl\\vinyl\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{88686ECF-415F-2C9D-9309-B00AD2F61324}|Vinyl\\Vinyl.csproj|solutionrelative:vinyl\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{88686ECF-415F-2C9D-9309-B00AD2F61324}|Vinyl\\Vinyl.csproj|e:\\piu\\git desktop repos\\vinyl---vibes\\vinyl\\vinyl\\persoana.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{88686ECF-415F-2C9D-9309-B00AD2F61324}|Vinyl\\Vinyl.csproj|solutionrelative:vinyl\\persoana.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{88686ECF-415F-2C9D-9309-B00AD2F61324}|Vinyl\\Vinyl.csproj|e:\\piu\\git desktop repos\\vinyl---vibes\\vinyl\\vinyl\\data\\administrarevinylurimemorie.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{88686ECF-415F-2C9D-9309-B00AD2F61324}|Vinyl\\Vinyl.csproj|solutionrelative:vinyl\\data\\administrarevinylurimemorie.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{88686ECF-415F-2C9D-9309-B00AD2F61324}|Vinyl\\Vinyl.csproj|e:\\piu\\git desktop repos\\vinyl---vibes\\vinyl\\vinyl\\vinyl.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{88686ECF-415F-2C9D-9309-B00AD2F61324}|Vinyl\\Vinyl.csproj|solutionrelative:vinyl\\vinyl.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{88686ECF-415F-2C9D-9309-B00AD2F61324}|Vinyl\\Vinyl.csproj|e:\\piu\\git desktop repos\\vinyl---vibes\\vinyl\\vinyl\\app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{88686ECF-415F-2C9D-9309-B00AD2F61324}|Vinyl\\Vinyl.csproj|solutionrelative:vinyl\\app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
     }
   ],
   "DocumentGroupContainers": [
@@ -25,48 +37,85 @@
           "SelectedChildIndex": 1,
           "Children": [
             {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Persoana.cs",
-              "DocumentMoniker": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\Persoana.cs",
-              "RelativeDocumentMoniker": "Vinyl\\Persoana.cs",
-              "ToolTip": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\Persoana.cs",
-              "RelativeToolTip": "Vinyl\\Persoana.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAWAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-06T17:58:44.29Z",
-              "IsPinned": true,
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Vinyl.cs",
-              "DocumentMoniker": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\Vinyl.cs",
-              "RelativeDocumentMoniker": "Vinyl\\Vinyl.cs",
-              "ToolTip": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\Vinyl.cs",
-              "RelativeToolTip": "Vinyl\\Vinyl.cs",
-              "ViewState": "AgIAAA8AAAAAAAAAAAA5wDgAAAAfAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-06T17:02:44.192Z",
-              "IsPinned": true,
-              "EditorCaption": ""
-            },
-            {
               "$type": "Bookmark",
               "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
             },
             {
               "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Persoana.cs",
+              "DocumentMoniker": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\Models\\Persoana.cs",
+              "RelativeDocumentMoniker": "Vinyl\\Models\\Persoana.cs",
+              "ToolTip": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\Models\\Persoana.cs",
+              "RelativeToolTip": "Vinyl\\Models\\Persoana.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-22T10:27:17.208Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "Vinyl.cs",
+              "DocumentMoniker": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\Models\\Vinyl.cs",
+              "RelativeDocumentMoniker": "Vinyl\\Models\\Vinyl.cs",
+              "ToolTip": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\Models\\Vinyl.cs",
+              "RelativeToolTip": "Vinyl\\Models\\Vinyl.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-22T10:27:18.057Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "Program.cs",
               "DocumentMoniker": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\Program.cs",
               "RelativeDocumentMoniker": "Vinyl\\Program.cs",
               "ToolTip": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\Program.cs",
               "RelativeToolTip": "Vinyl\\Program.cs",
-              "ViewState": "AgIAADoAAAAAAAAAAAAgwAYAAAAdAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-06T17:01:54.069Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AdministrareVinyluriMemorie.cs",
+              "DocumentMoniker": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\Data\\AdministrareVinyluriMemorie.cs",
+              "RelativeDocumentMoniker": "Vinyl\\Data\\AdministrareVinyluriMemorie.cs",
+              "ToolTip": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\Data\\AdministrareVinyluriMemorie.cs",
+              "RelativeToolTip": "Vinyl\\Data\\AdministrareVinyluriMemorie.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-22T10:27:15.225Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Vinyl.csproj",
+              "DocumentMoniker": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\Vinyl.csproj",
+              "RelativeDocumentMoniker": "Vinyl\\Vinyl.csproj",
+              "ToolTip": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\Vinyl.csproj",
+              "RelativeToolTip": "Vinyl\\Vinyl.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-03-22T10:36:01.326Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "App.config",
+              "DocumentMoniker": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\App.config",
+              "RelativeDocumentMoniker": "Vinyl\\App.config",
+              "ToolTip": "E:\\PIU\\Git Desktop Repos\\Vinyl---Vibes\\Vinyl\\Vinyl\\App.config",
+              "RelativeToolTip": "Vinyl\\App.config",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
+              "WhenOpened": "2026-03-22T10:36:56.046Z",
               "EditorCaption": ""
             }
           ]

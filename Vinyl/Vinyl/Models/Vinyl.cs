@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace vinyl
+namespace VinylApp.Models
 {
     public class Vinyl
     {
         public string NumeImprumutat { get; set; }
-        public bool EsteImpumutat => !string.IsNullOrEmpty(NumeImprumutat);
+        public bool EsteImprumutat => !string.IsNullOrEmpty(NumeImprumutat);
         public string CaleAudioSnippet { get; set; }
         public string Titlu { get; set; }
         public string Artist { get; set; }
@@ -54,16 +54,16 @@ namespace vinyl
 
         public string Info()
         {
-            string numeAfisat = string.IsNullOrEmpty(Titlu) ? "VINYL NESETAT" : Titlu;
-            string stare = EsteImpumutat ? "[Imprumutat la " + NumeImprumutat + "]" : "[In raft]";
-            string detalii = Artist + " - " + numeAfisat + " (" + An_Lansare + ")" + stare;
+            string numeAfisat = string.IsNullOrEmpty(Titlu) ? "VINYL NESET" : Titlu;
+            string stare = EsteImprumutat ? "[Imprumutat la " + NumeImprumutat + "]" : "[In raft]";
+            string detalii = Artist + " - " + numeAfisat + " (" + An_Lansare + ") " + stare;
 
             string tracklist = "\nTracklist:";
             if (Melodii != null && Melodii.Length > 0)
             {
                 for (int i = 0; i < Melodii.Length; i++)
                 {
-                    tracklist += $"\n {i + 1}. {Melodii[i]}";
+                    tracklist += $"\n  {i + 1}. {Melodii[i]}";
                 }
             }
             else
@@ -71,9 +71,9 @@ namespace vinyl
                 tracklist += " Nu sunt melodii inregistrate.";
             }
 
-            return  "\n" + detalii + "\nSnippet: " + (string.IsNullOrEmpty(CaleAudioSnippet) ? "Fara audio" : CaleAudioSnippet) +
-                    "\nConditie: " + ConditieDisc + tracklist + "\n--------------------------";
-
+            return "\n" + detalii +
+                   "\nSnippet: " + (string.IsNullOrEmpty(CaleAudioSnippet) ? "Fara audio" : CaleAudioSnippet) +
+                   "\nConditie: " + ConditieDisc + tracklist + "\n--------------------------";
         }
     }
 }

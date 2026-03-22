@@ -1,8 +1,9 @@
-﻿using System;
-using vinyl.Models;
-using vinyl.Data;
+using System;
+using System.Collections.Generic;
+using VinylApp.Data;
+using VinylApp.Models;
 
-namespace vinyl
+namespace VinylApp
 {
     class Program
     {
@@ -33,10 +34,12 @@ namespace vinyl
                         int.TryParse(Console.ReadLine(), out int anLansare);
                         Console.Write("Cod conditie (1-8): ");
                         int.TryParse(Console.ReadLine(), out int conditie);
+
                         Vinyl discNou = new Vinyl(titlu, artist, anLansare, 0)
                         {
                             CodConditie = conditie
                         };
+
                         Console.Write("Cate melodii are albumul? ");
                         if (int.TryParse(Console.ReadLine(), out int nrMelodii) && nrMelodii > 0)
                         {
@@ -49,23 +52,20 @@ namespace vinyl
                                 Console.Write("Featuring (lasati liber si apasati Enter daca e piesa solo): ");
                                 string feat = Console.ReadLine();
 
-                                if (!string.IsNullOrWhiteSpace(feat))
-                                {
-                                    tracklist[i] = $"{numePiesa} (feat. {feat})";
-                                }
-                                else
-                                {
-                                    tracklist[i] = numePiesa;
-                                }
+                                tracklist[i] = !string.IsNullOrWhiteSpace(feat)
+                                    ? $"{numePiesa} (feat. {feat})"
+                                    : numePiesa;
                             }
                             discNou.Melodii = tracklist;
                         }
+
                         Console.Write("\nEste acest disc imprumutat cuiva? (da/nu): ");
-                        if(Console.ReadLine().ToLower() == "da")
+                        if (Console.ReadLine().ToLower() == "da")
                         {
                             Console.Write("Numele persoanei care l-a luat: ");
                             discNou.NumeImprumutat = Console.ReadLine();
                         }
+
                         adminVinyluri.AddVinyl(discNou);
                         Console.WriteLine("Disc adaugat cu succes!");
                         break;
@@ -73,18 +73,19 @@ namespace vinyl
                     case "B":
                         Console.WriteLine("\n--- COLECTIE VINYLURI ---");
                         List<Vinyl> discuri = adminVinyluri.GetAllVinyls();
-                        if(discuri.Count == 0)
+                        if (discuri.Count == 0)
                         {
                             Console.WriteLine("Colectia este goala.");
                         }
                         else
-                                                    {
+                        {
                             foreach (Vinyl disc in discuri)
                             {
                                 Console.WriteLine(disc.Info());
                             }
                         }
                         break;
+
                     case "C":
                         Console.Write("\nIntroduceti titlul cautat: ");
                         string titluCautat = Console.ReadLine();
@@ -102,18 +103,19 @@ namespace vinyl
                             }
                         }
                         break;
+
                     case "D":
                         Console.Write("\nIntroduceti artistul cautat: ");
                         string artistCautat = Console.ReadLine();
                         List<Vinyl> gasiteDupaArtist = adminVinyluri.GetVinylByArtist(artistCautat);
-                        if(gasiteDupaArtist.Count == 0)
+                        if (gasiteDupaArtist.Count == 0)
                         {
                             Console.WriteLine("Nu s-au gasit vinyluri de la acest artist.");
                         }
                         else
                         {
                             Console.WriteLine($"\nS-au gasit {gasiteDupaArtist.Count} rezultate:");
-                            foreach (Vinyl v in gasiteDupaArtist) 
+                            foreach (Vinyl v in gasiteDupaArtist)
                                 Console.WriteLine(v.Info());
                         }
                         break;
@@ -121,6 +123,7 @@ namespace vinyl
                     case "X":
                         Console.WriteLine("La revedere!");
                         break;
+
                     default:
                         Console.WriteLine("Optiune invalida, incercati din nou.");
                         break;

@@ -28,3 +28,4 @@ E:\PIU\Git Desktop Repos\Vinyl---Vibes\Vinyl\Vinyl\bin\Debug\net10.0\Vinyl.dll
 E:\PIU\Git Desktop Repos\Vinyl---Vibes\Vinyl\Vinyl\bin\Debug\net10.0\Vinyl.pdb
 E:\PIU\Git Desktop Repos\Vinyl---Vibes\Vinyl\Vinyl\obj\Debug\net10.0\Vinyl.genruntimeconfig.cache
 E:\PIU\Git Desktop Repos\Vinyl---Vibes\Vinyl\Vinyl\obj\Debug\net10.0\ref\Vinyl.dll
+E:\PIU\Git Desktop Repos\Vinyl---Vibes\Vinyl\Vinyl\bin\Debug\net10.0\Vinyl.dll.config
