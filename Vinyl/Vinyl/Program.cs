@@ -1,4 +1,6 @@
 ﻿using System;
+using vinyl.Models;
+using vinyl.Data;
 
 namespace vinyl
 {

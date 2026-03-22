@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Vinyl")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+021d5d915bcc71af7cb62b96c818599d6c64cbb2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+444072892a0ff27a6bcbe262c65b06e17a0eb279")]
 [assembly: System.Reflection.AssemblyProductAttribute("Vinyl")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Vinyl")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
