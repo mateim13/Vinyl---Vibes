@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using VinylApp.Models;
+using LibrarieModele;
 
-namespace VinylApp.Data
+namespace NivelStocareDate
 {
     public class AdministrareVinyluriMemorie
     {

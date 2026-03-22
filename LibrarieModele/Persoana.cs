@@ -1,6 +1,6 @@
 using System;
 
-namespace VinylApp.Models
+namespace LibrarieModele
 {
     public class Persoana
     {

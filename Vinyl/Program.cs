@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using VinylApp.Data;
-using VinylApp.Models;
+using LibrarieModele;
+using NivelStocareDate;
 
 namespace VinylApp
 {
@@ -24,12 +24,24 @@ namespace VinylApp
 
                 switch (optiune)
                 {
-                    case "A": AdaugaVinyl(adminVinyluri); break;
-                    case "B": AfiseazaToateVinylurile(adminVinyluri); break;
-                    case "C": CautaDupaTitlu(adminVinyluri); break;
-                    case "D": CautaDupaArtist(adminVinyluri); break;
-                    case "X": Console.WriteLine("La revedere!"); break;
-                    default:  Console.WriteLine("Optiune invalida, incercati din nou."); break;
+                    case "A": 
+                        AdaugaVinyl(adminVinyluri); 
+                        break;
+                    case "B": 
+                        AfiseazaToateVinylurile(adminVinyluri); 
+                        break;
+                    case "C": 
+                        CautaDupaTitlu(adminVinyluri); 
+                        break;
+                    case "D": 
+                        CautaDupaArtist(adminVinyluri); 
+                        break;
+                    case "X": 
+                        Console.WriteLine("La revedere!"); 
+                        break;
+                    default:  
+                        Console.WriteLine("Optiune invalida, incercati din nou."); 
+                        break;
                 }
             } while (optiune != "X");
         }

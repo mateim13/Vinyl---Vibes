@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace VinylApp.Models
+namespace LibrarieModele
 {
     public class Vinyl
     {
