@@ -2,21 +2,6 @@ using System;
 
 namespace LibrarieModele
 {
-    public enum RolPersoana
-    {
-        Colectionar,    
-        Imprumutator,   
-        Vanzator,       
-        Cumparator      
-    }
-
-    public enum StareMembru
-    {
-        Activ,    
-        Inactiv,  
-        VIP         
-    }
-
     public class Persoana
     {
         public string Nume { get; set; }
@@ -31,9 +16,9 @@ namespace LibrarieModele
             {
                 switch (Stare)
                 {
-                    case StareMembru.VIP:    return int.MaxValue; 
+                    case StareMembru.VIP:    return int.MaxValue;
                     case StareMembru.Activ:  return 3;
-                    default:                 return 0;            
+                    default:                 return 0;
                 }
             }
         }
@@ -63,29 +48,26 @@ namespace LibrarieModele
                 motiv = $"{Nume} este inactiv si nu poate imprumuta discuri.";
                 return false;
             }
-
             if (Stare == StareMembru.Activ && discuriCurente >= 3)
             {
                 motiv = $"{Nume} (Activ) a atins limita de 3 discuri imprumutate simultan.";
                 return false;
             }
-
             motiv = string.Empty;
             return true;
         }
 
-        public string InfoPersoana()
+        public string Info()
         {
             string lista = (DiscuriImprumutate != null && DiscuriImprumutate.Length > 0)
                 ? string.Join(", ", DiscuriImprumutate)
-                : "Niciun disc momentan";
-
+                : "niciun disc";
             string limitaStr = Stare == StareMembru.VIP ? "nelimitata" : LimitaImprumut.ToString();
 
-            return "Persoana: " + Nume + " | Contact: " + Contact +
-                   " | Rol: " + Rol + " | Stare: " + Stare +
-                   " | Limita imprumut: " + limitaStr +
-                   "\nAre imprumutate: " + lista;
+            return $"Persoana : {Nume} | Contact: {Contact}" +
+                   $"\nRol      : {Rol} | Stare: {Stare} | Limita imprumut: {limitaStr}" +
+                   $"\nImprumuta: {lista}" +
+                   "\n---";
         }
     }
 }

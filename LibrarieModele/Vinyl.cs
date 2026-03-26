@@ -1,37 +1,9 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace LibrarieModele
 {
-    [Flags]
-    public enum GenMuzical
-    {
-        Necunoscut  = 0,
-        Rock        = 1,
-        Jazz        = 2,
-        Pop         = 4,
-        Blues       = 8,
-        Electronic  = 16,
-        HipHop      = 32,
-        Clasic      = 64,
-        RnB         = 128,  
-        Soul        = 256,
-        Altele      = 512
-    }
-
-    [Flags]
-    public enum FormatVinyl
-    {
-        Nedefinit   = 0,
-        LP          = 1,      
-        EP          = 2,       
-        Single      = 4,       
-        Reissue     = 8,       
-        Colored     = 16,      
-        PictureDisc = 32      
-    }
-
     public class Vinyl
     {
         private string _numeImprumutatManual;
@@ -44,7 +16,7 @@ namespace LibrarieModele
             {
                 _imprumutatorPersoana = value;
                 if (value != null)
-                    _numeImprumutatManual = null; 
+                    _numeImprumutatManual = null;
             }
         }
 
@@ -54,7 +26,7 @@ namespace LibrarieModele
             set
             {
                 _numeImprumutatManual = value;
-                _imprumutatorPersoana = null; 
+                _imprumutatorPersoana = null;
             }
         }
 
@@ -66,8 +38,7 @@ namespace LibrarieModele
         public int An_Lansare { get; set; }
         public float Pret { get; set; }
         public int CodConditie { get; set; }
-        public string[] Melodii { get; set; }
-        public float[] DurataMelodiiMinute { get; set; }
+        public Melodie[] Melodii { get; set; }
         public GenMuzical Gen { get; set; }
         public FormatVinyl Format { get; set; }
 
@@ -97,21 +68,13 @@ namespace LibrarieModele
         {
             get
             {
-                if (DurataMelodiiMinute == null || DurataMelodiiMinute.Length == 0)
-                    return "N/A";
-
-                float totalMinute = 0;
-                foreach (float d in DurataMelodiiMinute)
-                    totalMinute += d;
-
-                if (totalMinute <= 0)
-                    return "N/A";
-
+                if (Melodii == null || Melodii.Length == 0) return "N/A";
+                float totalMinute = Melodii.Sum(m => m.DurataMinute);
+                if (totalMinute <= 0) return "N/A";
                 int totalSec = (int)Math.Round(totalMinute * 60);
-                int ore = totalSec / 3600;
-                int minute = (totalSec % 3600) / 60;
+                int ore     = totalSec / 3600;
+                int minute  = (totalSec % 3600) / 60;
                 int secunde = totalSec % 60;
-
                 return ore > 0
                     ? $"{ore}h {minute}m {secunde}s"
                     : $"{minute}m {secunde}s";
@@ -122,8 +85,7 @@ namespace LibrarieModele
         {
             Titlu = string.Empty;
             Artist = "Neprecizat";
-            Melodii = new string[0];
-            DurataMelodiiMinute = new float[0];
+            Melodii = new Melodie[0];
             Gen = GenMuzical.Necunoscut;
             Format = FormatVinyl.LP;
         }
@@ -134,8 +96,7 @@ namespace LibrarieModele
             Artist = artist;
             An_Lansare = anLansare;
             Pret = pret;
-            Melodii = new string[0];
-            DurataMelodiiMinute = new float[0];
+            Melodii = new Melodie[0];
             Gen = GenMuzical.Necunoscut;
             Format = FormatVinyl.LP;
         }
@@ -151,34 +112,25 @@ namespace LibrarieModele
             else
                 stareStr = "[In raft]";
 
-            string detalii = Artist + " - " + numeAfisat + " (" + An_Lansare + ") " + stareStr;
-
-            string tracklist = "\nTracklist:";
+            var sb = new StringBuilder();
+            sb.AppendLine($"Vinyl   : {Artist} - {numeAfisat} ({An_Lansare}) {stareStr}");
+            sb.AppendLine($"Gen     : {Gen} | Format: {Format}");
+            sb.AppendLine($"Conditie: {ConditieDisc}");
+            sb.AppendLine($"Durata  : {DurataTotalaFormatata}");
+            if (!string.IsNullOrEmpty(CaleAudioSnippet))
+                sb.AppendLine($"Snippet : {CaleAudioSnippet}");
+            sb.AppendLine("Tracklist:");
             if (Melodii != null && Melodii.Length > 0)
             {
-                for (int i = 0; i < Melodii.Length; i++)
-                {
-                    string durata = "";
-                    if (DurataMelodiiMinute != null && i < DurataMelodiiMinute.Length && DurataMelodiiMinute[i] > 0)
-                    {
-                        int min = (int)DurataMelodiiMinute[i];
-                        int sec = (int)Math.Round((DurataMelodiiMinute[i] - min) * 60);
-                        durata = $" [{min}:{sec:D2}]";
-                    }
-                    tracklist += $"\n  {i + 1}. {Melodii[i]}{durata}";
-                }
+                foreach (var (m, i) in Melodii.Select((m, i) => (m, i + 1)))
+                    sb.AppendLine($"  {m.Info(i)}");
             }
             else
             {
-                tracklist += " Nu sunt melodii inregistrate.";
+                sb.AppendLine("  (fara melodii inregistrate)");
             }
-
-            return "\n" + detalii +
-                   "\nGen: " + Gen +
-                   " | Format: " + Format +
-                   " | Durata totala: " + DurataTotalaFormatata +
-                   "\nSnippet: " + (string.IsNullOrEmpty(CaleAudioSnippet) ? "Fara audio" : CaleAudioSnippet) +
-                   "\nConditie: " + ConditieDisc + tracklist + "\n--------------------------";
+            sb.Append("---");
+            return sb.ToString();
         }
     }
 }
