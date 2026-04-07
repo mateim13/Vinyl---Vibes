@@ -4,11 +4,11 @@ namespace LibrarieModele
 {
     public class Persoana
     {
-        public string Nume { get; set; }
+        public string Nume    { get; set; }
         public string Contact { get; set; }
         public string[] DiscuriImprumutate { get; set; }
-        public RolPersoana Rol { get; set; }
-        public StareMembru Stare { get; set; }
+        public RolPersoana  Rol   { get; set; }
+        public StareMembru  Stare { get; set; }
 
         public int LimitaImprumut
         {
@@ -16,9 +16,9 @@ namespace LibrarieModele
             {
                 switch (Stare)
                 {
-                    case StareMembru.VIP:    return int.MaxValue;
-                    case StareMembru.Activ:  return 3;
-                    default:                 return 0;
+                    case StareMembru.VIP:   return int.MaxValue;
+                    case StareMembru.Activ: return 3;
+                    default:                return 0;
                 }
             }
         }
@@ -68,6 +68,29 @@ namespace LibrarieModele
                    $"\nRol      : {Rol} | Stare: {Stare} | Limita imprumut: {limitaStr}" +
                    $"\nImprumuta: {lista}" +
                    "\n---";
+        }
+
+        public static Persoana? FromLine(string linie)
+        {
+            var p = linie.Split('|');
+            if (p[0] != "PERSOANA" || p.Length < 5) return null;
+
+            Enum.TryParse<RolPersoana> (p[3], out RolPersoana  rol);
+            Enum.TryParse<StareMembru> (p[4], out StareMembru  stare);
+
+            var persoana = new Persoana(p[1], p.Length > 2 ? p[2] : string.Empty, rol, stare);
+            if (p.Length > 5 && !string.IsNullOrEmpty(p[5]))
+                persoana.DiscuriImprumutate = p[5].Split(';');
+
+            return persoana;
+        }
+
+        public string ToLine()
+        {
+            string discuri = (DiscuriImprumutate != null && DiscuriImprumutate.Length > 0)
+                ? string.Join(";", DiscuriImprumutate)
+                : string.Empty;
+            return $"PERSOANA|{Nume}|{Contact}|{Rol}|{Stare}|{discuri}";
         }
     }
 }

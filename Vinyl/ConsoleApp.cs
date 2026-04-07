@@ -12,16 +12,16 @@ namespace VinylApp
         const string FisierVinyluri = "vinyluri.txt";
         const string FisierPersone  = "persoane.txt";
 
-        readonly AdministrareVinyluriMemorie adminVinyluri;
-        readonly RepoPersone repoPersone;
+        readonly RepoVinyluri repoVinyluri;
+        readonly RepoPersone  repoPersone;
 
         public ConsoleApp()
         {
-            adminVinyluri = new AdministrareVinyluriMemorie(FisierVinyluri);
-            repoPersone   = new RepoPersone(FisierPersone);
+            repoVinyluri = new RepoVinyluri(FisierVinyluri);
+            repoPersone  = new RepoPersone(FisierPersone);
         }
 
-        public void Run()
+        public void Ruleaza()
         {
             string optiune;
             do
@@ -43,41 +43,100 @@ namespace VinylApp
 
                 switch (optiune)
                 {
-                    case "A": AdaugaVinyl(); break;
-                    case "B": AfiseazaLista(adminVinyluri.GetAllVinyls(), "COLECTIE VINYLURI"); break;
-                    case "C": CautaDupaTitlu(); break;
-                    case "D": CautaDupaArtist(); break;
-                    case "E": AfiseazaLista(adminVinyluri.GetVinyluriBorrowed(), "DISCURI IMPRUMUTATE"); break;
-                    case "F": AfiseazaCeleMaiRecente(); break;
-                    case "G": CautaDupaGen(); break;
-                    case "H": ModificaVinyl(); break;
-                    case "I": StergeVinyl(); break;
-                    case "J": ReturneazaVinyl(); break;
-                    case "K": MeniuPersone(); break;
-                    case "X": Console.WriteLine("La revedere!"); break;
-                    default:  Console.WriteLine("Optiune invalida, incercati din nou."); break;
+                    case "A": AdaugaVinyl();  
+                        break;
+                    case "B": AfiseazaListaVinyluri(repoVinyluri.ObtineToti(), "COLECTIE VINYLURI");   
+                        break;
+                    case "C": CautaDupaTitlu();                                                           
+                        break;
+                    case "D": CautaDupaArtist();                                                           
+                        break;
+                    case "E": AfiseazaListaVinyluri(repoVinyluri.ObtineImprumutate(), "DISCURI IMPRUMUTATE"); 
+                        break;
+                    case "F": AfiseazaCeleMaiRecente();                                                    
+                        break;
+                    case "G": CautaDupaGen();                                                              
+                        break;
+                    case "H": ModificaVinyl();                                                            
+                        break;
+                    case "I": StergeVinyl();                                                               
+                        break;
+                    case "J": ReturneazaVinyl();                                                          
+                        break;
+                    case "K": MeniuPersone();                                                              
+                        break;
+                    case "X": Console.WriteLine("La revedere!");                                           
+                        break;
+                    default:  Console.WriteLine("Optiune invalida, incercati din nou.");                   
+                        break;
                 }
             } while (optiune != "X");
         }
 
-        void AfiseazaLista(List<Vinyl> discuri, string titlu)
+        private int CitesteAn(int valImplicita = 0)
         {
-            Console.WriteLine($"\n--- {titlu} ({discuri.Count} inregistrari) ---");
-            if (discuri.Count == 0) { Console.WriteLine("Nicio intrare de afisat."); return; }
-            foreach (var (v, i) in discuri.Select((v, i) => (v, i + 1)))
+            Console.Write("An lansare: ");
+            string input = Console.ReadLine() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(input)) return valImplicita;
+
+            if (!int.TryParse(input, out int an))
             {
-                Console.WriteLine($"\n=== {i} ===");
-                Console.WriteLine(v.Info());
+                Console.WriteLine("  Eroare: an invalid.");
+                return valImplicita;
             }
+
+            try
+            {
+                var test = new Vinyl();
+                test.An_Lansare = an;
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                Console.WriteLine($"  Eroare: {ex.Message}");
+                return valImplicita;
+            }
+
+            return an;
         }
 
-        GenMuzical CitesteGen()
+        private float CitestePret(float valImplicita = 0f)
+        {
+            Console.Write("Pret (RON): ");
+            string input = (Console.ReadLine() ?? string.Empty).Replace(',', '.');
+            if (string.IsNullOrWhiteSpace(input)) return valImplicita;
+
+            if (!float.TryParse(input, NumberStyles.Float, CultureInfo.InvariantCulture, out float pret) || pret < 0)
+            {
+                Console.WriteLine("  Eroare: pret invalid (trebuie >= 0).");
+                return valImplicita;
+            }
+            return pret;
+        }
+
+        private int CitesteConditie(int valImplicita = 0)
+        {
+            Console.WriteLine("Conditie: 1=Poor  2=Fair  3=Good  4=G+  5=VG  6=VG+  7=NM  8=Mint");
+            Console.Write("Alegeti conditia (1-8): ");
+            if (int.TryParse(Console.ReadLine(), out int c) && c >= 1 && c <= 8)
+                return c;
+            Console.WriteLine("  Conditie invalida, se pastreaza valoarea implicita.");
+            return valImplicita;
+        }
+
+        private float CitesteDurata()
+        {
+            Console.Write("Durata (minute, ex: 3.5 = 3m30s): ");
+            float.TryParse((Console.ReadLine() ?? string.Empty).Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out float durata);
+            return durata;
+        }
+
+        private GenMuzical CitesteGen()
         {
             Console.WriteLine("Gen muzical (combina cu +, ex: 1+8 pentru Rock+Blues):");
             Console.WriteLine("  1=Rock  2=Jazz  4=Pop  8=Blues  16=Electronic");
             Console.WriteLine("  32=HipHop  64=Clasic  128=RnB  256=Soul  512=Altele");
             Console.Write("Alegeti gen: ");
-            string[] parti = (Console.ReadLine() ?? "").Split('+');
+            string[] parti = (Console.ReadLine() ?? string.Empty).Split('+');
             GenMuzical genAles = GenMuzical.Necunoscut;
             foreach (string parte in parti)
             {
@@ -87,12 +146,12 @@ namespace VinylApp
             return genAles;
         }
 
-        FormatVinyl CitesteFormat()
+        private FormatVinyl CitesteFormat()
         {
             Console.WriteLine("Format vinil (combina cu +, ex: 1+16 pentru LP colorat):");
             Console.WriteLine("  1=LP  2=EP  4=Single  8=Reissue  16=Colored  32=PictureDisc");
             Console.Write("Alegeti format: ");
-            string[] parti = (Console.ReadLine() ?? "").Split('+');
+            string[] parti = (Console.ReadLine() ?? string.Empty).Split('+');
             FormatVinyl formatAles = FormatVinyl.Nedefinit;
             foreach (string parte in parti)
             {
@@ -102,31 +161,50 @@ namespace VinylApp
             return formatAles == FormatVinyl.Nedefinit ? FormatVinyl.LP : formatAles;
         }
 
-        StareMembru CitesteStareMembru()
+        private StareMembru CitesteStareMembru()
         {
             Console.Write("Stare membru (Activ/Inactiv/VIP) [implicit Activ]: ");
-            string input = Console.ReadLine() ?? "";
+            string input = Console.ReadLine() ?? string.Empty;
             return Enum.TryParse<StareMembru>(input, true, out StareMembru stare) ? stare : StareMembru.Activ;
         }
 
-        void AdaugaVinyl()
+        private RolPersoana CitesteRol(RolPersoana valImplicita = RolPersoana.Colectionar)
+        {
+            Console.Write("Rol (Colectionar/Imprumutator/Vanzator/Cumparator): ");
+            return Enum.TryParse<RolPersoana>(Console.ReadLine() ?? string.Empty, true, out RolPersoana rol) ? rol : valImplicita;
+        }
+
+        private void AfiseazaListaVinyluri(List<Vinyl> discuri, string titlu)
+        {
+            Console.WriteLine($"\n--- {titlu} ({discuri.Count} inregistrari) ---");
+            if (discuri.Count == 0) 
+            { 
+                Console.WriteLine("Nicio intrare de afisat."); 
+                return; 
+            }
+            foreach (var (v, i) in discuri.Select((v, i) => (v, i + 1)))
+            {
+                Console.WriteLine($"\n=== {i} ===");
+                Console.WriteLine(v.Info());
+            }
+        }
+
+        private void AdaugaVinyl()
         {
             Console.WriteLine("\n--- ADAUGARE DISC NOU ---");
-            Console.Write("Titlu album: ");
-            string titlu = Console.ReadLine() ?? "";
-            Console.Write("Artist: ");
-            string artist = Console.ReadLine() ?? "";
-            Console.Write("An lansare: ");
-            int.TryParse(Console.ReadLine(), out int anLansare);
-            Console.WriteLine("Conditie: 1=Poor  2=Fair  3=Good  4=G+  5=VG  6=VG+  7=NM  8=Mint");
-            Console.Write("Alegeti conditia (1-8): ");
-            int.TryParse(Console.ReadLine(), out int conditie);
+            Console.Write("Titlu album: "); 
+            string titlu  = Console.ReadLine() ?? string.Empty;
+            Console.Write("Artist: ");      
+            string artist = Console.ReadLine() ?? string.Empty;
+
+            int anLansare = CitesteAn();
+            int conditie  = CitesteConditie();
 
             var discNou = new Vinyl(titlu, artist, anLansare, 0)
             {
                 CodConditie = conditie,
-                Gen         = CitesteGen(),
-                Format      = CitesteFormat()
+                Gen = CitesteGen(),
+                Format = CitesteFormat()
             };
 
             Console.Write("\nCate melodii are albumul? ");
@@ -135,121 +213,104 @@ namespace VinylApp
                 var melodii = new List<Melodie>();
                 for (int i = 0; i < nrMelodii; i++)
                 {
-                    Console.Write($"Titlu melodie {i + 1}: ");
-                    string numePiesa = Console.ReadLine() ?? "";
-                    Console.Write("Featuring (Enter daca e solo): ");
-                    string feat = Console.ReadLine() ?? "";
-                    Console.Write("Durata (minute, ex: 3.5 = 3m30s): ");
-                    float.TryParse((Console.ReadLine() ?? "").Replace(',', '.'),
-                        NumberStyles.Float, CultureInfo.InvariantCulture, out float durata);
-                    melodii.Add(new Melodie(numePiesa, feat, durata));
+                    Console.Write($"Titlu melodie {i + 1}: "); string numePiesa = Console.ReadLine() ?? string.Empty;
+                    Console.Write("Featuring (Enter daca e solo): "); string feat = Console.ReadLine() ?? string.Empty;
+                    melodii.Add(new Melodie(numePiesa, feat, CitesteDurata()));
                 }
                 discNou.Melodii = melodii.ToArray();
             }
 
             Console.Write("\nEste acest disc imprumutat cuiva? (da/nu): ");
-            if ((Console.ReadLine() ?? "").Trim().ToLower() == "da")
+            if ((Console.ReadLine() ?? string.Empty).Trim().ToLower() == "da")
             {
-                Console.Write("Numele persoanei: ");
-                string numePers = Console.ReadLine() ?? "";
-                adminVinyluri.ImprumutaVinyl(discNou,
-                    new Persoana(numePers, "", RolPersoana.Imprumutator, CitesteStareMembru()));
+                Console.Write("Numele persoanei: "); 
+                string numePers = Console.ReadLine() ?? string.Empty;
+                repoVinyluri.ImprumutaVinyl(discNou, new Persoana(numePers, string.Empty, RolPersoana.Imprumutator, CitesteStareMembru()));
             }
 
-            adminVinyluri.AddVinyl(discNou);
+            repoVinyluri.Adauga(discNou);
             Console.WriteLine("Disc adaugat si salvat cu succes!");
         }
 
-        void CautaDupaTitlu()
+        private void CautaDupaTitlu()
         {
             Console.Write("\nTitlul cautat: ");
-            string titlu = Console.ReadLine() ?? "";
-            AfiseazaLista(adminVinyluri.GetVinylByTitle(titlu), $"REZULTATE: \"{titlu}\"");
+            string titlu = Console.ReadLine() ?? string.Empty;
+            AfiseazaListaVinyluri(repoVinyluri.CautaDupaTitlu(titlu), $"REZULTATE: \"{titlu}\"");
         }
 
-        void CautaDupaArtist()
+        private void CautaDupaArtist()
         {
             Console.Write("\nArtistul cautat: ");
-            string artist = Console.ReadLine() ?? "";
-            AfiseazaLista(adminVinyluri.GetVinylByArtist(artist), $"REZULTATE: \"{artist}\"");
+            string artist = Console.ReadLine() ?? string.Empty;
+            AfiseazaListaVinyluri(repoVinyluri.CautaDupaArtist(artist), $"REZULTATE: \"{artist}\"");
         }
 
-        void CautaDupaGen()
+        private void CautaDupaGen()
         {
             GenMuzical gen = CitesteGen();
             string genStr  = gen == GenMuzical.Necunoscut ? "Necunoscut" : gen.ToString();
-            AfiseazaLista(adminVinyluri.GetVinylByGen(gen), $"REZULTATE GEN: {genStr}");
+            AfiseazaListaVinyluri(repoVinyluri.CautaDupaGen(gen), $"REZULTATE GEN: {genStr}");
         }
 
-        void AfiseazaCeleMaiRecente()
+        private void AfiseazaCeleMaiRecente()
         {
             Console.Write("\nCate vinyluri sa afiseze (top N): ");
             if (int.TryParse(Console.ReadLine(), out int n) && n > 0)
-                AfiseazaLista(adminVinyluri.GetTopVinyluriByYear(n), $"TOP {n} CELE MAI RECENTE");
+                AfiseazaListaVinyluri(repoVinyluri.ObtineCeleMaiRecente(n), $"TOP {n} CELE MAI RECENTE");
             else
                 Console.WriteLine("Numar invalid.");
         }
 
-        void ModificaVinyl()
+        private void ModificaVinyl()
         {
             Console.Write("\nTitlul vinylului de modificat: ");
-            string titlu = Console.ReadLine() ?? "";
-            var gasite = adminVinyluri.GetVinylByTitle(titlu);
+            string titlu = Console.ReadLine() ?? string.Empty;
+            var gasite = repoVinyluri.CautaDupaTitlu(titlu);
             if (gasite.Count == 0) { Console.WriteLine("Vinyl negasit."); return; }
 
             var original = gasite[0];
             Console.WriteLine("Vinyl gasit:"); Console.WriteLine(original.Info());
             Console.WriteLine("Datele noi (Enter = pastram valoarea curenta):");
 
-            Console.Write("Titlu: ");    
-            string titluNou  = Console.ReadLine() ?? "";
-            Console.Write("Artist: ");   
-            string artistNou = Console.ReadLine() ?? "";
-            Console.Write("An lansare: "); 
-            string anStr   = Console.ReadLine() ?? "";
-            Console.Write("Conditie (1-8): "); 
-            string condStr = Console.ReadLine() ?? "";
+            Console.Write("Titlu: ");  string titluNou  = Console.ReadLine() ?? string.Empty;
+            Console.Write("Artist: "); string artistNou = Console.ReadLine() ?? string.Empty;
+
+            int anNou = CitesteAn(original.An_Lansare);
+            int conditieNou = CitesteConditie(original.CodConditie);
 
             var modificat = new Vinyl(
-                string.IsNullOrWhiteSpace(titluNou) ? original.Titlu : titluNou,
+                string.IsNullOrWhiteSpace(titluNou)  ? original.Titlu  : titluNou,
                 string.IsNullOrWhiteSpace(artistNou) ? original.Artist : artistNou,
-                int.TryParse(anStr, out int anNou) ? anNou : original.An_Lansare, original.Pret)
+                anNou, original.Pret)
             {
-                CodConditie = int.TryParse(condStr, out int condNou) ? condNou : original.CodConditie,
+                CodConditie = conditieNou,
                 Gen = original.Gen,
                 Format = original.Format,
                 Melodii = original.Melodii,
                 CaleAudioSnippet = original.CaleAudioSnippet
             };
-            if (original.EsteImprumutat) 
-            {
+            if (original.EsteImprumutat)
                 modificat.NumeImprumutat = original.NumeImprumutat;
-            }
 
-            Console.WriteLine(adminVinyluri.ModificaVinyl(titlu, modificat)
-                ? "Vinyl modificat si salvat cu succes!"
-                : "Eroare la modificare.");
+            Console.WriteLine(repoVinyluri.ModificaVinyl(titlu, modificat) ? "Vinyl modificat si salvat cu succes!" : "Eroare la modificare.");
         }
 
-        void StergeVinyl()
+        private void StergeVinyl()
         {
             Console.Write("\nTitlul vinylului de sters: ");
-            string titlu = Console.ReadLine() ?? "";
-            Console.WriteLine(adminVinyluri.StergeVinyl(titlu)
-                ? $"Vinylul '{titlu}' a fost sters."
-                : "Vinyl negasit.");
+            string titlu = Console.ReadLine() ?? string.Empty;
+            Console.WriteLine(repoVinyluri.StergeVinyl(titlu) ? $"Vinylul '{titlu}' a fost sters." : "Vinyl negasit.");
         }
 
-        void ReturneazaVinyl()
+        private void ReturneazaVinyl()
         {
             Console.Write("\nTitlul vinylului de returnat: ");
-            string titlu = Console.ReadLine() ?? "";
-            Console.WriteLine(adminVinyluri.ReturnazaVinyl(titlu)
-                ? $"Vinylul '{titlu}' a fost returnat in colectie."
-                : "Vinyl negasit sau nu este imprumutat.");
+            string titlu = Console.ReadLine() ?? string.Empty;
+            Console.WriteLine(repoVinyluri.ReturnazaVinyl(titlu) ? $"Vinylul '{titlu}' a fost returnat in colectie." : "Vinyl negasit sau nu este imprumutat.");
         }
 
-        void MeniuPersone()
+        private void MeniuPersone()
         {
             string opt;
             do
@@ -261,25 +322,36 @@ namespace VinylApp
                 Console.WriteLine("4. Modifica persoana");
                 Console.WriteLine("5. Sterge persoana");
                 Console.WriteLine("0. Inapoi");
-                opt = Console.ReadLine()?.Trim() ?? "";
+                opt = Console.ReadLine()?.Trim() ?? string.Empty;
 
                 switch (opt)
                 {
-                    case "1": AdaugaPersoana(); break;
-                    case "2": AfiseazaPersone(repoPersone.GetAllPersone(), "TOATE PERSOANELE"); break;
-                    case "3": CautaPersoana(); break;
-                    case "4": ModificaPersoana(); break;
-                    case "5": StergePersoana(); break;
-                    case "0": break;
-                    default: Console.WriteLine("Optiune invalida."); break;
+                    case "1": AdaugaPersoana();                                                                  
+                        break;
+                    case "2": AfiseazaListaPersone(repoPersone.ObtineToti(), "TOATE PERSOANELE");               
+                        break;
+                    case "3": CautaPersoana();                                                                   
+                        break;
+                    case "4": ModificaPersoana();                                                                
+                        break;
+                    case "5": StergePersoana();                                                                  
+                        break;
+                    case "0": 
+                        break;
+                    default:  Console.WriteLine("Optiune invalida."); 
+                        break;
                 }
             } while (opt != "0");
         }
 
-        void AfiseazaPersone(List<Persoana> persoane, string titlu)
+        private void AfiseazaListaPersone(List<Persoana> persoane, string titlu)
         {
             Console.WriteLine($"\n--- {titlu} ({persoane.Count} inregistrari) ---");
-            if (persoane.Count == 0) { Console.WriteLine("Nicio persoana de afisat."); return; }
+            if (persoane.Count == 0) 
+            { 
+                Console.WriteLine("Nicio persoana de afisat."); 
+                return; 
+            }
             foreach (var (p, i) in persoane.Select((p, i) => (p, i + 1)))
             {
                 Console.WriteLine($"\n=== {i} ===");
@@ -287,61 +359,60 @@ namespace VinylApp
             }
         }
 
-        void AdaugaPersoana()
+        private void AdaugaPersoana()
         {
             Console.WriteLine("\n--- ADAUGARE PERSOANA ---");
-            Console.Write("Nume: ");    string nume    = Console.ReadLine() ?? "";
-            Console.Write("Contact: "); string contact = Console.ReadLine() ?? "";
-            Console.Write("Rol (Colectionar/Imprumutator/Vanzator/Cumparator): ");
-            Enum.TryParse<RolPersoana>(Console.ReadLine() ?? "", true, out RolPersoana rol);
-            repoPersone.AdaugaPersoana(new Persoana(nume, contact, rol, CitesteStareMembru()));
+            Console.Write("Nume: ");
+            string nume    = Console.ReadLine() ?? string.Empty;
+            Console.Write("Contact: "); 
+            string contact = Console.ReadLine() ?? string.Empty;
+            repoPersone.Adauga(new Persoana(nume, contact, CitesteRol(), CitesteStareMembru()));
             Console.WriteLine("Persoana adaugata si salvata cu succes!");
         }
 
-        void CautaPersoana()
+        private void CautaPersoana()
         {
             Console.Write("\nNumele persoanei cautate: ");
-            string nume = Console.ReadLine() ?? "";
-            var p = repoPersone.GetPersoanaByNume(nume);
+            string nume = Console.ReadLine() ?? string.Empty;
+            var p = repoPersone.CautaDupaNumePersoana(nume);
             Console.WriteLine(p == null ? "Persoana negasita." : "\n" + p.Info());
         }
 
-        void ModificaPersoana()
+        private void ModificaPersoana()
         {
             Console.Write("\nNumele persoanei de modificat: ");
-            string numeCurent = Console.ReadLine() ?? "";
-            var original = repoPersone.GetPersoanaByNume(numeCurent);
-            if (original == null) { Console.WriteLine("Persoana negasita."); return; }
-
+            string numeCurent = Console.ReadLine() ?? string.Empty;
+            var original = repoPersone.CautaDupaNumePersoana(numeCurent);
+            if (original == null) 
+            { 
+                Console.WriteLine("Persoana negasita."); 
+                return; 
+            }
             Console.WriteLine("Persoana gasita:"); Console.WriteLine(original.Info());
             Console.WriteLine("Datele noi (Enter = pastram valoarea curenta):");
 
-            Console.Write("Nume: ");    string numeNou    = Console.ReadLine() ?? "";
-            Console.Write("Contact: "); string contactNou = Console.ReadLine() ?? "";
-            Console.Write("Rol (Colectionar/Imprumutator/Vanzator/Cumparator): ");
-            RolPersoana rolNou = Enum.TryParse<RolPersoana>(Console.ReadLine() ?? "", true, out RolPersoana r)
-                ? r : original.Rol;
+            Console.Write("Nume: ");    
+            string numeNou = Console.ReadLine() ?? string.Empty;
+            Console.Write("Contact: "); 
+            string contactNou = Console.ReadLine() ?? string.Empty;
 
             var noua = new Persoana(
-                string.IsNullOrWhiteSpace(numeNou)    ? original.Nume    : numeNou,
+                string.IsNullOrWhiteSpace(numeNou) ? original.Nume : numeNou,
                 string.IsNullOrWhiteSpace(contactNou) ? original.Contact : contactNou,
-                rolNou, CitesteStareMembru())
+                CitesteRol(original.Rol),
+                CitesteStareMembru())
             {
                 DiscuriImprumutate = original.DiscuriImprumutate
             };
 
-            Console.WriteLine(repoPersone.ModificaPersoana(numeCurent, noua)
-                ? "Persoana modificata si salvata cu succes!"
-                : "Eroare la modificare.");
+            Console.WriteLine(repoPersone.ModificaPersoana(numeCurent, noua) ? "Persoana modificata si salvata cu succes!": "Eroare la modificare.");
         }
 
-        void StergePersoana()
+        private void StergePersoana()
         {
             Console.Write("\nNumele persoanei de sters: ");
-            string nume = Console.ReadLine() ?? "";
-            Console.WriteLine(repoPersone.StergePersoana(nume)
-                ? $"Persoana '{nume}' a fost stearsa."
-                : "Persoana negasita.");
+            string nume = Console.ReadLine() ?? string.Empty;
+            Console.WriteLine(repoPersone.StergePersoana(nume) ? $"Persoana '{nume}' a fost stearsa." : "Persoana negasita.");
         }
     }
 }

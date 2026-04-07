@@ -1,3 +1,3 @@
-using VinylApp;
+using System.Windows;
 
-new ConsoleApp().Run();
+new VinylApp.ConsoleApp().Ruleaza();
