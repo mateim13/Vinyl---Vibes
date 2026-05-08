@@ -1,17 +1,36 @@
 # Vinyl Vibes — Sistem de Gestiune Viniluri
 
-O aplicație desktop C# cu interfață grafică (WPF) destinată colecționarilor de discuri de vinil. Permite organizarea colecției, monitorizarea stării fizice a discurilor și gestionarea împrumuturilor.
+O aplicație desktop C# cu interfață grafică WPF destinată colecționarilor de discuri de vinil.
+Permite organizarea colecției, monitorizarea stării fizice a discurilor, gestionarea împrumuturilor și editarea/ștergerea înregistrărilor.
 
 ---
 
 ## Funcționalități
 
-- **Adăugare vinyluri** — formular complet cu validare: artist, titlu, an lansare, preț, gen muzical, format și condiție disc
+- **Meniu lateral hamburger** — bară de navigare pliabilă (50 px ↔ 200 px) cu pictograme și text
+- **Tab-uri de navigare** — Adaugă · Colecție · Împrumutate · Editare
+- **Adăugare vinyluri** — formular cu validare completă: artist, titlu, an, preț, gen muzical (multi-select cu CheckBox), format și condiție disc (ComboBox)
+- **Editare vinyluri** — formularul de editare pre-populat cu datele existente, salvare cu re-validare
+- **Ștergere vinyluri** — confirmare dialog înainte de ștergere permanentă
+- **Căutare în timp real** — filtrare listă după artist sau titlu, cu actualizare la fiecare tastă
+- **Vizualizare colecție** — ListBox cu template personalizat: iconiță disc, detalii, badge stare (📥 În raft / 📤 Împrumutat)
+- **Vizualizare împrumuturi** — tab separat cu lista discurilor împrumutate
 - **Sistem de grading** — condiție disc pe scara 1–8 (Poor → Mint)
-- **Gestionare împrumuturi** — marcare disc ca împrumutat și înregistrarea numelui persoanei
-- **Vizualizare colecție** — lista de discuri cu detalii și badge de stare (în raft / împrumutat)
 - **Persistență** — datele sunt salvate automat în fișiere text (`vinyluri.txt`, `persoane.txt`)
-- **Validare cu feedback vizual** — mesaje de eroare per câmp și mesaj de confirmare la adăugare cu succes
+- **Validare cu feedback vizual** — mesaje de eroare per câmp cu schimbare de culoare label
+
+---
+
+## Controale WPF Utilizate
+
+| Control | Utilizare | Locație |
+|---------|-----------|---------|
+| **ListBox** | Afișare colecție vinyluri + lista împrumuturi (cu `DataTemplate` personalizat) | Tab Colecție, Tab Împrumutate |
+| **ComboBox** | Selecție Format disc (LP/EP/Single/...) și Condiție disc (Poor→Mint) | Formular Adaugă, Formular Editare |
+| **CheckBox** | Selecție multiplă genuri muzicale (`[Flags]`) + marcare disc împrumutat | Formular Adaugă, Formular Editare |
+| **DatePicker** | Selectare data achiziției discului (opțional, template dark custom) | Formular Adaugă, Formular Editare |
+| **TextBox** | Input text: artist, titlu, an, preț, nume persoană, căutare | Formulare + bara de căutare |
+| **Button** | Acțiuni: adaugă, reset, editează, șterge, hamburger, navigare tab-uri | Toate secțiunile |
 
 ---
 
@@ -21,7 +40,7 @@ O aplicație desktop C# cu interfață grafică (WPF) destinată colecționarilo
 Vinyl.slnx
 │
 ├── LibrarieModele/          # Nivelul Model (entități de domeniu)
-│   ├── Enums.cs             # GenMuzical, FormatVinyl, RolPersoana, StareMembru
+│   ├── Enums.cs             # GenMuzical [Flags], FormatVinyl, RolPersoana, StareMembru
 │   ├── Melodie.cs           # Model melodie + FromLine() / ToLine()
 │   ├── Persoana.cs          # Model persoană + FromLine() / ToLine()
 │   └── Vinyl.cs             # Model vinyl + TryFromLines() / ToLines()
@@ -29,13 +48,9 @@ Vinyl.slnx
 ├── NivelStocareDate/        # Nivelul de Stocare (persistență fișiere)
 │   └── GestiuneDate.cs      # GestiuneDate<T> · RepoVinyluri · RepoPersone
 │
-├── Interfata/               # Nivelul Prezentare (WPF)
-│   ├── MainWindow.xaml      # UI · stiluri · layout 2 coloane
-│   └── MainWindow.xaml.cs   # Logică prezentare + validare câmpuri
-│
-└── Vinyl/                   # Aplicație consolă (referință / testare)
-    ├── Program.cs
-    └── ConsoleApp.cs
+└── Interfata/               # Nivelul Prezentare (WPF)
+    ├── MainWindow.xaml       # UI: stiluri, meniu hamburger, tab-uri, formulare
+    └── MainWindow.xaml.cs    # Logica de prezentare, navigare, validare, CRUD
 ```
 
 ---
@@ -54,14 +69,11 @@ Vinyl.slnx
 ## Build & Run
 
 ```powershell
-# Interfața grafică WPF (recomandat)
+# Rulare aplicație WPF
 dotnet run --project Interfata\Interfata.csproj
 
-# Aplicația de consolă (alternativă)
-dotnet run --project Vinyl\Vinyl.csproj
-
 # Doar compilare
-dotnet build
+dotnet build "Vinyl.slnx"
 ```
 
 > Fișierele de date (`vinyluri.txt`, `persoane.txt`) sunt create automat la prima rulare, în directorul de lucru curent.

@@ -65,6 +65,7 @@ namespace LibrarieModele
         public Melodie[] Melodii { get; set; }
         public GenMuzical Gen { get; set; }
         public FormatVinyl Format { get; set; }
+        public DateTime? DataAchizitie { get; set; }
 
         public bool EsteVintage => _anLansare < 1990;
         public bool NecesitaAtentie => CodConditie <= 3;
@@ -160,10 +161,13 @@ namespace LibrarieModele
             string imprumutat = EsteImprumutat ? "1" : "0";
             string numeImp = NumeImprumutat ?? string.Empty;
             string cale = CaleAudioSnippet ?? string.Empty;
+            string dataAch = DataAchizitie.HasValue
+                ? DataAchizitie.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+                : string.Empty;
 
             yield return $"VINYL|{Titlu}|{Artist}|{_anLansare}|" +
                          $"{_pret.ToString(CultureInfo.InvariantCulture)}|{CodConditie}|" +
-                         $"{(int)Gen}|{(int)Format}|{imprumutat}|{numeImp}|{cale}";
+                         $"{(int)Gen}|{(int)Format}|{imprumutat}|{numeImp}|{cale}|{dataAch}";
 
             if (Melodii != null)
                 foreach (var m in Melodii)
@@ -199,6 +203,11 @@ namespace LibrarieModele
                 vinyl._numeImprumutatManual = p[9];
 
             vinyl.CaleAudioSnippet = p.Length > 10 && !string.IsNullOrEmpty(p[10]) ? p[10] : null;
+
+            if (p.Length > 11 && !string.IsNullOrEmpty(p[11])
+                && DateTime.TryParseExact(p[11], "yyyy-MM-dd",
+                       CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dataAch))
+                vinyl.DataAchizitie = dataAch;
 
             index++;
 

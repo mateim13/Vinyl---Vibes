@@ -38,22 +38,25 @@ namespace Interfata
         private const double MENU_EXTINS   = 200;
 
         private IEnumerable<TextBlock> NavLabels =>
-            new[] { NavLblAdauga, NavLblColectie, NavLblImprumutat };
+            new[] { NavLblAdauga, NavLblColectie, NavLblImprumutat, NavLblEditare };
 
-        private enum Tab { Adauga, Colectie, Imprumutat }
+        private enum Tab { Adauga, Colectie, Imprumutat, Editare }
         private Tab _tabCurent = Tab.Adauga;
+
+        private string? _titluOriginalEditat = null;
 
         private readonly RepoVinyluri repo =
             new RepoVinyluri(@"E:\PIU\Git Desktop Repos\Vinyl---Vibes\vinyluri.txt");
-
-        private List<VinylVM> _toateVinylurile = new List<VinylVM>();
 
         private record VinylVM(
             string DisplayNume,
             string DisplayDetalii,
             string DisplayStare,
             string Artist,
-            string Titlu);
+            string Titlu,
+            string TitluOriginal);
+
+        private List<VinylVM> _toateVinylurile = new List<VinylVM>();
 
         public MainWindow()
         {
@@ -65,13 +68,20 @@ namespace Interfata
         private void IncarcaDate()
         {
             _toateVinylurile = repo.ObtineToti()
-                .Select(v => new VinylVM(
-                    DisplayNume:    $"{v.Artist}  –  {v.Titlu}  ({v.An_Lansare})",
-                    DisplayDetalii: $"{v.Gen}  ·  {v.Format}  ·  {v.ConditieDisc}  ·  {v.DurataTotalaFormatata}",
-                    DisplayStare:   v.EsteImprumutat ? $"📤 {v.NumeImprumutat}" : "📥 În raft",
-                    Artist:         v.Artist,
-                    Titlu:          v.Titlu
-                )).ToList();
+                .Select(v =>
+                {
+                    string dataStr = v.DataAchizitie.HasValue
+                        ? $"  ·  Achiziționat: {v.DataAchizitie.Value:dd.MM.yyyy}"
+                        : string.Empty;
+                    return new VinylVM(
+                        DisplayNume:    $"{v.Artist}  –  {v.Titlu}  ({v.An_Lansare})",
+                        DisplayDetalii: $"{v.Gen}  ·  {v.Format}  ·  {v.ConditieDisc}  ·  {v.DurataTotalaFormatata}{dataStr}",
+                        DisplayStare:   v.EsteImprumutat ? $"📤 {v.NumeImprumutat}" : "📥 În raft",
+                        Artist:         v.Artist,
+                        Titlu:          v.Titlu,
+                        TitluOriginal:  v.Titlu
+                    );
+                }).ToList();
         }
 
         private void ActualizeazaBadge()
@@ -84,9 +94,12 @@ namespace Interfata
         {
             _tabCurent = tab;
 
-            TabAdauga.Visibility    = Visibility.Collapsed;
-            TabColectie.Visibility  = Visibility.Collapsed;
+            TabAdauga.Visibility     = Visibility.Collapsed;
+            TabColectie.Visibility   = Visibility.Collapsed;
             TabImprumutat.Visibility = Visibility.Collapsed;
+            TabEditare.Visibility    = Visibility.Collapsed;
+
+            BtnNavEditare.Visibility = tab == Tab.Editare ? Visibility.Visible : Visibility.Collapsed;
 
             BtnNavAdauga.Style     = (Style)FindResource("NavItemButton");
             BtnNavColectie.Style   = (Style)FindResource("NavItemButton");
@@ -95,13 +108,13 @@ namespace Interfata
             switch (tab)
             {
                 case Tab.Adauga:
-                    TabAdauga.Visibility    = Visibility.Visible;
-                    BtnNavAdauga.Style      = (Style)FindResource("NavItemButtonActive");
+                    TabAdauga.Visibility   = Visibility.Visible;
+                    BtnNavAdauga.Style     = (Style)FindResource("NavItemButtonActive");
                     break;
 
                 case Tab.Colectie:
-                    TabColectie.Visibility  = Visibility.Visible;
-                    BtnNavColectie.Style    = (Style)FindResource("NavItemButtonActive");
+                    TabColectie.Visibility = Visibility.Visible;
+                    BtnNavColectie.Style   = (Style)FindResource("NavItemButtonActive");
                     IncarcaDate();
                     AplicaFiltruCautare();
                     ActualizeazaBadge();
@@ -113,12 +126,25 @@ namespace Interfata
                     IncarcaDate();
                     AplicaListaImprumutat();
                     break;
+
+                case Tab.Editare:
+                    TabEditare.Visibility = Visibility.Visible;
+                    BtnNavEditare.Style   = (Style)FindResource("NavItemButtonActive");
+                    break;
             }
         }
 
         private void OnNavAdauga(object sender, RoutedEventArgs e)     => SetTab(Tab.Adauga);
         private void OnNavColectie(object sender, RoutedEventArgs e)   => SetTab(Tab.Colectie);
         private void OnNavImprumutat(object sender, RoutedEventArgs e) => SetTab(Tab.Imprumutat);
+
+        private void OnNavInapoiDinEditare(object sender, RoutedEventArgs e)
+        {
+            _titluOriginalEditat = null;
+            TbMesajSuccesEdit.Visibility = Visibility.Collapsed;
+            TbMesajEroareEdit.Visibility = Visibility.Collapsed;
+            SetTab(Tab.Colectie);
+        }
 
         private void AplicaFiltruCautare()
         {
@@ -133,15 +159,11 @@ namespace Interfata
                     .ToList();
 
             lstVinyluri.ItemsSource = items;
-
-            bool gol = !items.Any();
-            BdrListaGoala.Visibility = gol ? Visibility.Visible : Visibility.Collapsed;
+            BdrListaGoala.Visibility = items.Any() ? Visibility.Collapsed : Visibility.Visible;
         }
 
         private void OnCautareChanged(object sender, TextChangedEventArgs e)
-        {
-            AplicaFiltruCautare();
-        }
+            => AplicaFiltruCautare();
 
         private void AplicaListaImprumutat()
         {
@@ -151,6 +173,165 @@ namespace Interfata
 
             lstImprumutat.ItemsSource = items;
             BdrImpGoala.Visibility = items.Any() ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void OnEditeazaVinyl(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button btn) return;
+            string titlu = btn.Tag?.ToString() ?? string.Empty;
+
+            var vinyl = repo.ObtineToti()
+                            .FirstOrDefault(v => v.Titlu == titlu);
+            if (vinyl == null) return;
+
+            _titluOriginalEditat = titlu;
+
+            TxtEditArtist.Text = vinyl.Artist;
+            TxtEditTitlu.Text  = vinyl.Titlu;
+            TxtEditAn.Text     = vinyl.An_Lansare.ToString();
+            TxtEditPret.Text   = vinyl.Pret.ToString(CultureInfo.InvariantCulture);
+
+            ChkEditRock.IsChecked       = (vinyl.Gen & GenMuzical.Rock)       != 0;
+            ChkEditJazz.IsChecked       = (vinyl.Gen & GenMuzical.Jazz)       != 0;
+            ChkEditPop.IsChecked        = (vinyl.Gen & GenMuzical.Pop)        != 0;
+            ChkEditBlues.IsChecked      = (vinyl.Gen & GenMuzical.Blues)      != 0;
+            ChkEditElectronic.IsChecked = (vinyl.Gen & GenMuzical.Electronic) != 0;
+            ChkEditHipHop.IsChecked     = (vinyl.Gen & GenMuzical.HipHop)     != 0;
+            ChkEditClasic.IsChecked     = (vinyl.Gen & GenMuzical.Clasic)     != 0;
+            ChkEditRnB.IsChecked        = (vinyl.Gen & GenMuzical.RnB)        != 0;
+            ChkEditSoul.IsChecked       = (vinyl.Gen & GenMuzical.Soul)       != 0;
+            ChkEditAltele.IsChecked     = (vinyl.Gen & GenMuzical.Altele)     != 0;
+
+            SelecteazaTagInComboBox(CmbEditFormat, (int)vinyl.Format);
+
+            SelecteazaTagInComboBox(CmbEditConditie, vinyl.CodConditie);
+
+            DpEditDataAchizitie.SelectedDate = vinyl.DataAchizitie;
+
+            ChkEditImprumutat.IsChecked = vinyl.EsteImprumutat;
+            if (vinyl.EsteImprumutat)
+            {
+                PanelEditNumeImprumutat.Visibility = Visibility.Visible;
+                TxtEditNumeImprumutat.Text = vinyl.NumeImprumutat ?? string.Empty;
+            }
+            else
+            {
+                PanelEditNumeImprumutat.Visibility = Visibility.Collapsed;
+                TxtEditNumeImprumutat.Text = string.Empty;
+            }
+
+            TbMesajSuccesEdit.Visibility = Visibility.Collapsed;
+            TbMesajEroareEdit.Visibility = Visibility.Collapsed;
+            AscundeToateEroriEdit();
+
+            TbEditareTitluHeader.Text = $"Editează  \"{vinyl.Artist} – {vinyl.Titlu}\"";
+
+            SetTab(Tab.Editare);
+        }
+
+        private void SelecteazaTagInComboBox(ComboBox cmb, int tagValue)
+        {
+            foreach (ComboBoxItem item in cmb.Items)
+            {
+                if (int.TryParse(item.Tag?.ToString(), out int t) && t == tagValue)
+                {
+                    cmb.SelectedItem = item;
+                    return;
+                }
+            }
+            cmb.SelectedIndex = 0;
+        }
+
+        private void ChkEditImprumutat_Changed(object sender, RoutedEventArgs e)
+        {
+            PanelEditNumeImprumutat.Visibility =
+                ChkEditImprumutat.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+            if (ChkEditImprumutat.IsChecked != true)
+            {
+                TxtEditNumeImprumutat.Text = string.Empty;
+                AscundeMesajEroare(TbErrEditNumeImprumutat, LblEditNumeImprumutat);
+            }
+        }
+
+        private void OnSalveazaModificari(object sender, RoutedEventArgs e)
+        {
+            TbMesajSuccesEdit.Visibility = Visibility.Collapsed;
+            TbMesajEroareEdit.Visibility = Visibility.Collapsed;
+
+            int cod = ValideazaDateEdit();
+            AplicaEroriEdit(cod);
+            if (cod != ERR_OK) return;
+
+            int.TryParse  (TxtEditAn.Text.Trim(),   out int   an);
+            float.TryParse(TxtEditPret.Text.Trim(),
+                           NumberStyles.Float, CultureInfo.InvariantCulture, out float pret);
+
+            var original = repo.ObtineToti()
+                               .FirstOrDefault(v => v.Titlu == _titluOriginalEditat);
+
+            var vinylNou = new Vinyl
+            {
+                Artist      = TxtEditArtist.Text.Trim(),
+                Titlu       = TxtEditTitlu.Text.Trim(),
+                An_Lansare  = an,
+                Pret        = pret,
+                Gen         = (GenMuzical) CitesteGenuri(edit: true),
+                Format      = (FormatVinyl)CitesteTagComboBox(CmbEditFormat),
+                CodConditie = CitesteTagComboBox(CmbEditConditie),
+                DataAchizitie    = DpEditDataAchizitie.SelectedDate,
+                Melodii          = original?.Melodii ?? new Melodie[0],
+                CaleAudioSnippet = original?.CaleAudioSnippet
+            };
+
+            if (ChkEditImprumutat.IsChecked == true)
+                vinylNou.NumeImprumutat = TxtEditNumeImprumutat.Text.Trim();
+
+            bool ok = repo.ModificaVinyl(_titluOriginalEditat!, vinylNou);
+
+            if (ok)
+            {
+                TbMesajSuccesEdit.Text = $"✓  \"{vinylNou.Artist} – {vinylNou.Titlu}\" actualizat cu succes!";
+                TbMesajSuccesEdit.Visibility = Visibility.Visible;
+
+                _titluOriginalEditat = vinylNou.Titlu;
+                TbEditareTitluHeader.Text = $"Editează  \"{vinylNou.Artist} – {vinylNou.Titlu}\"";
+
+                IncarcaDate();
+                ActualizeazaBadge();
+            }
+            else
+            {
+                TbMesajEroareEdit.Text = "Eroare: vinylul nu a putut fi actualizat. Verificați titlul original.";
+                TbMesajEroareEdit.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void OnStergeVinyl(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button btn) return;
+            string titlu = btn.Tag?.ToString() ?? string.Empty;
+
+            var rezultat = MessageBox.Show(
+                $"Ești sigur că vrei să ștergi vinylul \"{titlu}\"?\nAceastă acțiune nu poate fi anulată.",
+                "Confirmare ștergere",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (rezultat != MessageBoxResult.Yes) return;
+
+            bool ok = repo.StergeVinyl(titlu);
+            if (ok)
+            {
+                IncarcaDate();
+                ActualizeazaBadge();
+                AplicaFiltruCautare();
+            }
+            else
+            {
+                MessageBox.Show($"Eroare la ștergerea vinylului \"{titlu}\".",
+                                "Eroare", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void OnHamburgerClick(object sender, RoutedEventArgs e)
@@ -175,19 +356,35 @@ namespace Interfata
             }
         }
 
-        private int CitesteGenuri()
+        private int CitesteGenuri(bool edit = false)
         {
             int gen = 0;
-            if (ChkRock.IsChecked       == true) gen |= (int)GenMuzical.Rock;
-            if (ChkJazz.IsChecked       == true) gen |= (int)GenMuzical.Jazz;
-            if (ChkPop.IsChecked        == true) gen |= (int)GenMuzical.Pop;
-            if (ChkBlues.IsChecked      == true) gen |= (int)GenMuzical.Blues;
-            if (ChkElectronic.IsChecked == true) gen |= (int)GenMuzical.Electronic;
-            if (ChkHipHop.IsChecked     == true) gen |= (int)GenMuzical.HipHop;
-            if (ChkClasic.IsChecked     == true) gen |= (int)GenMuzical.Clasic;
-            if (ChkRnB.IsChecked        == true) gen |= (int)GenMuzical.RnB;
-            if (ChkSoul.IsChecked       == true) gen |= (int)GenMuzical.Soul;
-            if (ChkAltele.IsChecked     == true) gen |= (int)GenMuzical.Altele;
+            if (!edit)
+            {
+                if (ChkRock.IsChecked       == true) gen |= (int)GenMuzical.Rock;
+                if (ChkJazz.IsChecked       == true) gen |= (int)GenMuzical.Jazz;
+                if (ChkPop.IsChecked        == true) gen |= (int)GenMuzical.Pop;
+                if (ChkBlues.IsChecked      == true) gen |= (int)GenMuzical.Blues;
+                if (ChkElectronic.IsChecked == true) gen |= (int)GenMuzical.Electronic;
+                if (ChkHipHop.IsChecked     == true) gen |= (int)GenMuzical.HipHop;
+                if (ChkClasic.IsChecked     == true) gen |= (int)GenMuzical.Clasic;
+                if (ChkRnB.IsChecked        == true) gen |= (int)GenMuzical.RnB;
+                if (ChkSoul.IsChecked       == true) gen |= (int)GenMuzical.Soul;
+                if (ChkAltele.IsChecked     == true) gen |= (int)GenMuzical.Altele;
+            }
+            else
+            {
+                if (ChkEditRock.IsChecked       == true) gen |= (int)GenMuzical.Rock;
+                if (ChkEditJazz.IsChecked       == true) gen |= (int)GenMuzical.Jazz;
+                if (ChkEditPop.IsChecked        == true) gen |= (int)GenMuzical.Pop;
+                if (ChkEditBlues.IsChecked      == true) gen |= (int)GenMuzical.Blues;
+                if (ChkEditElectronic.IsChecked == true) gen |= (int)GenMuzical.Electronic;
+                if (ChkEditHipHop.IsChecked     == true) gen |= (int)GenMuzical.HipHop;
+                if (ChkEditClasic.IsChecked     == true) gen |= (int)GenMuzical.Clasic;
+                if (ChkEditRnB.IsChecked        == true) gen |= (int)GenMuzical.RnB;
+                if (ChkEditSoul.IsChecked       == true) gen |= (int)GenMuzical.Soul;
+                if (ChkEditAltele.IsChecked     == true) gen |= (int)GenMuzical.Altele;
+            }
             return gen;
         }
 
@@ -231,6 +428,38 @@ namespace Interfata
             return cod;
         }
 
+        private int ValideazaDateEdit()
+        {
+            int cod     = ERR_OK;
+            int anMaxim = DateTime.Now.Year;
+
+            string artist = TxtEditArtist.Text.Trim();
+            if (string.IsNullOrEmpty(artist))     cod |= ERR_ARTIST_GOL;
+            else if (artist.Length > MAX_ARTIST)  cod |= ERR_ARTIST_LUNG;
+
+            string titlu = TxtEditTitlu.Text.Trim();
+            if (string.IsNullOrEmpty(titlu))      cod |= ERR_TITLU_GOL;
+            else if (titlu.Length > MAX_TITLU)    cod |= ERR_TITLU_LUNG;
+
+            if (!int.TryParse(TxtEditAn.Text.Trim(), out int an) || an < AN_MIN || an > anMaxim)
+                cod |= ERR_AN_INVALID;
+
+            if (!float.TryParse(TxtEditPret.Text.Trim(),
+                    NumberStyles.Float, CultureInfo.InvariantCulture, out float pret)
+                || pret < 0 || pret > PRET_MAX)
+                cod |= ERR_PRET_INVALID;
+
+            if (CitesteGenuri(edit: true)            == 0) cod |= ERR_GEN_NESET;
+            if (CitesteTagComboBox(CmbEditFormat)    == 0) cod |= ERR_FORMAT_NESET;
+            if (CitesteTagComboBox(CmbEditConditie)  == 0) cod |= ERR_CONDITIE_NESET;
+
+            if (ChkEditImprumutat.IsChecked == true &&
+                string.IsNullOrEmpty(TxtEditNumeImprumutat.Text.Trim()))
+                cod |= ERR_NUME_IMP_GOL;
+
+            return cod;
+        }
+
         private void AfiseazaMesajEroare(TextBlock tb, Label lbl)
         {
             tb.Visibility  = Visibility.Visible;
@@ -259,25 +488,68 @@ namespace Interfata
             { TbErrTitlu.Text = $"Titlul nu poate depăși {MAX_TITLU} caractere!"; AfiseazaMesajEroare(TbErrTitlu, LblTitlu); }
             else AscundeMesajEroare(TbErrTitlu, LblTitlu);
 
-            if ((cod & ERR_AN_INVALID) != 0)
+            if ((cod & ERR_AN_INVALID)     != 0)
             { TbErrAn.Text = $"Introduceți un an valid ({AN_MIN}–{anMaxim})!"; AfiseazaMesajEroare(TbErrAn, LblAn); }
             else AscundeMesajEroare(TbErrAn, LblAn);
 
-            if ((cod & ERR_PRET_INVALID) != 0)
+            if ((cod & ERR_PRET_INVALID)   != 0)
             { TbErrPret.Text = $"Preț valid: 0–{PRET_MAX}, format 12.50!"; AfiseazaMesajEroare(TbErrPret, LblPret); }
             else AscundeMesajEroare(TbErrPret, LblPret);
 
             if ((cod & ERR_GEN_NESET)      != 0) AfiseazaMesajEroare(TbErrGen,           LblGen);
             else                                  AscundeMesajEroare(TbErrGen,            LblGen);
-
             if ((cod & ERR_FORMAT_NESET)   != 0) AfiseazaMesajEroare(TbErrFormat,        LblFormat);
             else                                  AscundeMesajEroare(TbErrFormat,         LblFormat);
-
             if ((cod & ERR_CONDITIE_NESET) != 0) AfiseazaMesajEroare(TbErrConditie,      LblConditie);
             else                                  AscundeMesajEroare(TbErrConditie,       LblConditie);
-
             if ((cod & ERR_NUME_IMP_GOL)   != 0) AfiseazaMesajEroare(TbErrNumeImprumutat, LblNumeImprumutat);
             else                                  AscundeMesajEroare(TbErrNumeImprumutat,  LblNumeImprumutat);
+        }
+
+        private void AplicaEroriEdit(int cod)
+        {
+            int anMaxim = DateTime.Now.Year;
+
+            if ((cod & ERR_ARTIST_GOL) != 0)
+            { TbErrEditArtist.Text = "Câmpul Artist este obligatoriu!"; AfiseazaMesajEroare(TbErrEditArtist, LblEditArtist); }
+            else if ((cod & ERR_ARTIST_LUNG) != 0)
+            { TbErrEditArtist.Text = $"Artistul nu poate depăși {MAX_ARTIST} caractere!"; AfiseazaMesajEroare(TbErrEditArtist, LblEditArtist); }
+            else AscundeMesajEroare(TbErrEditArtist, LblEditArtist);
+
+            if ((cod & ERR_TITLU_GOL) != 0)
+            { TbErrEditTitlu.Text = "Câmpul Titlu este obligatoriu!"; AfiseazaMesajEroare(TbErrEditTitlu, LblEditTitlu); }
+            else if ((cod & ERR_TITLU_LUNG) != 0)
+            { TbErrEditTitlu.Text = $"Titlul nu poate depăși {MAX_TITLU} caractere!"; AfiseazaMesajEroare(TbErrEditTitlu, LblEditTitlu); }
+            else AscundeMesajEroare(TbErrEditTitlu, LblEditTitlu);
+
+            if ((cod & ERR_AN_INVALID)     != 0)
+            { TbErrEditAn.Text = $"Introduceți un an valid ({AN_MIN}–{anMaxim})!"; AfiseazaMesajEroare(TbErrEditAn, LblEditAn); }
+            else AscundeMesajEroare(TbErrEditAn, LblEditAn);
+
+            if ((cod & ERR_PRET_INVALID)   != 0)
+            { TbErrEditPret.Text = $"Preț valid: 0–{PRET_MAX}, format 12.50!"; AfiseazaMesajEroare(TbErrEditPret, LblEditPret); }
+            else AscundeMesajEroare(TbErrEditPret, LblEditPret);
+
+            if ((cod & ERR_GEN_NESET)      != 0) AfiseazaMesajEroare(TbErrEditGen,              LblEditGen);
+            else                                  AscundeMesajEroare(TbErrEditGen,               LblEditGen);
+            if ((cod & ERR_FORMAT_NESET)   != 0) AfiseazaMesajEroare(TbErrEditFormat,           LblEditFormat);
+            else                                  AscundeMesajEroare(TbErrEditFormat,            LblEditFormat);
+            if ((cod & ERR_CONDITIE_NESET) != 0) AfiseazaMesajEroare(TbErrEditConditie,         LblEditConditie);
+            else                                  AscundeMesajEroare(TbErrEditConditie,          LblEditConditie);
+            if ((cod & ERR_NUME_IMP_GOL)   != 0) AfiseazaMesajEroare(TbErrEditNumeImprumutat,   LblEditNumeImprumutat);
+            else                                  AscundeMesajEroare(TbErrEditNumeImprumutat,    LblEditNumeImprumutat);
+        }
+
+        private void AscundeToateEroriEdit()
+        {
+            AscundeMesajEroare(TbErrEditArtist,          LblEditArtist);
+            AscundeMesajEroare(TbErrEditTitlu,           LblEditTitlu);
+            AscundeMesajEroare(TbErrEditAn,              LblEditAn);
+            AscundeMesajEroare(TbErrEditPret,            LblEditPret);
+            AscundeMesajEroare(TbErrEditGen,             LblEditGen);
+            AscundeMesajEroare(TbErrEditFormat,          LblEditFormat);
+            AscundeMesajEroare(TbErrEditConditie,        LblEditConditie);
+            AscundeMesajEroare(TbErrEditNumeImprumutat,  LblEditNumeImprumutat);
         }
 
         private void OnAdauga(object sender, RoutedEventArgs e)
@@ -294,21 +566,21 @@ namespace Interfata
 
             var vinyl = new Vinyl
             {
-                Artist      = TxtArtist.Text.Trim(),
-                Titlu       = TxtTitlu.Text.Trim(),
-                An_Lansare  = an,
-                Pret        = pret,
-                Gen         = (GenMuzical) CitesteGenuri(),
-                Format      = (FormatVinyl)CitesteTagComboBox(CmbFormat),
-                CodConditie = CitesteTagComboBox(CmbConditie),
-                Melodii     = new Melodie[0]
+                Artist        = TxtArtist.Text.Trim(),
+                Titlu         = TxtTitlu.Text.Trim(),
+                An_Lansare    = an,
+                Pret          = pret,
+                Gen           = (GenMuzical) CitesteGenuri(),
+                Format        = (FormatVinyl)CitesteTagComboBox(CmbFormat),
+                CodConditie   = CitesteTagComboBox(CmbConditie),
+                DataAchizitie = DpDataAchizitie.SelectedDate,
+                Melodii       = new Melodie[0]
             };
 
             if (ChkImprumutat.IsChecked == true)
                 vinyl.NumeImprumutat = TxtNumeImprumutat.Text.Trim();
 
             repo.Adauga(vinyl);
-
             IncarcaDate();
             ActualizeazaBadge();
 
@@ -326,27 +598,15 @@ namespace Interfata
 
         private void GoliesteCampuri()
         {
-            TxtArtist.Text         = string.Empty;
-            TxtTitlu.Text          = string.Empty;
-            TxtAn.Text             = string.Empty;
-            TxtPret.Text           = string.Empty;
-            TxtNumeImprumutat.Text = string.Empty;
+            TxtArtist.Text = TxtTitlu.Text = TxtAn.Text = TxtPret.Text = TxtNumeImprumutat.Text = string.Empty;
 
-            ChkRock.IsChecked       = false;
-            ChkJazz.IsChecked       = false;
-            ChkPop.IsChecked        = false;
-            ChkBlues.IsChecked      = false;
-            ChkElectronic.IsChecked = false;
-            ChkHipHop.IsChecked     = false;
-            ChkClasic.IsChecked     = false;
-            ChkRnB.IsChecked        = false;
-            ChkSoul.IsChecked       = false;
-            ChkAltele.IsChecked     = false;
+            ChkRock.IsChecked = ChkJazz.IsChecked = ChkPop.IsChecked = ChkBlues.IsChecked =
+            ChkElectronic.IsChecked = ChkHipHop.IsChecked = ChkClasic.IsChecked =
+            ChkRnB.IsChecked = ChkSoul.IsChecked = ChkAltele.IsChecked = false;
 
-            CmbFormat.SelectedIndex   = 0;
-            CmbConditie.SelectedIndex = 0;
-
-            ChkImprumutat.IsChecked        = false;
+            CmbFormat.SelectedIndex = CmbConditie.SelectedIndex = 0;
+            DpDataAchizitie.SelectedDate = null;
+            ChkImprumutat.IsChecked = false;
             PanelNumeImprumutat.Visibility = Visibility.Collapsed;
         }
 
