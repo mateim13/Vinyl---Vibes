@@ -1,6 +1,5 @@
 <Solution>
   <Project Path="LibrarieModele/LibrarieModele.csproj" Id="0c37a4c7-dec3-4acc-89e1-218b7435af83" />
   <Project Path="NivelStocareDate/NivelStocareDate.csproj" Id="181206b9-fe47-48ab-aede-807b262182b3" />
-  <Project Path="Vinyl/Vinyl.csproj" />
-  <Project Path="Interfata/Interfata.csproj" />
+<Project Path="Interfata/Interfata.csproj" />
 </Solution>

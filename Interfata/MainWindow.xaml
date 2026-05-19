@@ -704,6 +704,16 @@
                         </StackPanel>
                     </Button>
 
+                    <Button x:Name="BtnNavPersoane" Style="{StaticResource NavItemButton}"
+                            Click="OnNavPersoane" ToolTip="Persoane" Margin="0,0,0,4">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="👤" FontSize="17"
+                                       Width="44" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="NavLblPersoane" Text="Persoane"
+                                       FontSize="13" VerticalAlignment="Center" Visibility="Collapsed"/>
+                        </StackPanel>
+                    </Button>
+
                 </StackPanel>
             </Border>
 
@@ -867,10 +877,10 @@
                                                   Checked="ChkImprumutat_Changed"
                                                   Unchecked="ChkImprumutat_Changed"/>
                                         <StackPanel x:Name="PanelNumeImprumutat" Visibility="Collapsed" Margin="0,12,0,0">
-                                            <Label x:Name="LblNumeImprumutat" Content="Nume persoană" Style="{StaticResource FieldLabel}"/>
-                                            <TextBox x:Name="TxtNumeImprumutat" Style="{StaticResource ModernTextBox}"/>
+                                            <Label x:Name="LblNumeImprumutat" Content="Persoană" Style="{StaticResource FieldLabel}"/>
+                                            <ComboBox x:Name="CmbNumeImprumutat" Style="{StaticResource ModernComboBox}"/>
                                             <TextBlock x:Name="TbErrNumeImprumutat"
-                                                       Text="Introduceți numele persoanei!"
+                                                       Text="Selectați o persoană din listă!"
                                                        FontSize="10" Foreground="{StaticResource ErrorColor}"
                                                        Margin="2,3,0,0" Visibility="Collapsed"/>
                                         </StackPanel>
@@ -1096,6 +1106,201 @@
                     </Border>
                 </Grid>
 
+                <Grid x:Name="TabPersoane" Visibility="Collapsed" Margin="24,16,24,16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <DockPanel Grid.Row="0" Margin="0,0,0,14">
+                        <Border DockPanel.Dock="Right" VerticalAlignment="Center"
+                                Background="#1F0F1E" BorderBrush="#E94560"
+                                BorderThickness="1" CornerRadius="20" Padding="14,6">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="👤 " Foreground="#E94560" FontSize="12" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="TbNrPersoane"
+                                           Text="{Binding NrPersoane}"
+                                           Foreground="White" FontSize="12" FontWeight="SemiBold"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Persoane" Foreground="White" FontSize="18" FontWeight="SemiBold"/>
+                            <TextBlock Text="Gestionează colecționari și împrumutatori"
+                                       Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </DockPanel>
+
+                    <Border Grid.Row="1" Background="{StaticResource BgCard}"
+                            BorderBrush="{StaticResource BorderSubtle}"
+                            BorderThickness="1" CornerRadius="10" Padding="18,14" Margin="0,0,0,14">
+                        <StackPanel>
+                            <TextBlock x:Name="TbFormTitluPersoana" Text="Adaugă persoană nouă"
+                                       Foreground="White" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,12"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="14"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="14"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="14"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <Label x:Name="LblPNume" Content="Nume *" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox x:Name="TxtPNume" Style="{StaticResource ModernTextBox}"/>
+                                    <TextBlock x:Name="TbErrPNume" Text="Numele este obligatoriu!"
+                                               FontSize="10" Foreground="{StaticResource ErrorColor}"
+                                               Margin="2,3,0,0" Visibility="Collapsed"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <Label Content="Contact" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox x:Name="TxtPContact" Style="{StaticResource ModernTextBox}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="4">
+                                    <Label Content="Rol" Style="{StaticResource FieldLabel}"/>
+                                    <ComboBox x:Name="CmbPRol" Style="{StaticResource ModernComboBox}">
+                                        <ComboBoxItem Content="Colecționar" Tag="Colectionar" IsSelected="True"/>
+                                        <ComboBoxItem Content="Împrumutator" Tag="Imprumutator"/>
+                                        <ComboBoxItem Content="Vânzător"    Tag="Vanzator"/>
+                                        <ComboBoxItem Content="Cumpărător"  Tag="Cumparator"/>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="6">
+                                    <Label Content="Stare" Style="{StaticResource FieldLabel}"/>
+                                    <ComboBox x:Name="CmbPStare" Style="{StaticResource ModernComboBox}">
+                                        <ComboBoxItem Content="Activ"   Tag="Activ"   IsSelected="True"/>
+                                        <ComboBoxItem Content="Inactiv" Tag="Inactiv"/>
+                                        <ComboBoxItem Content="VIP"     Tag="VIP"/>
+                                    </ComboBox>
+                                </StackPanel>
+                            </Grid>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,12,0,0" HorizontalAlignment="Right">
+                                <TextBlock x:Name="TbMesajPersoana" FontSize="12" FontWeight="SemiBold"
+                                           VerticalAlignment="Center" Margin="0,0,12,0"
+                                           Visibility="Collapsed" TextWrapping="Wrap"/>
+                                <Button x:Name="BtnAnuleazaEditPersoana" Content="Anulează"
+                                        Style="{StaticResource SecondaryButton}" Width="90"
+                                        Visibility="Collapsed" Click="OnAnuleazaEditPersoana" Margin="0,0,8,0"/>
+                                <Button x:Name="BtnSalveazaPersoana" Content="＋  Adaugă"
+                                        Style="{StaticResource PrimaryButton}" Width="110"
+                                        Click="OnSalveazaPersoana"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Grid Grid.Row="2">
+                        <ListBox x:Name="lstPersoane"
+                                 ItemsSource="{Binding PersoaneAfisate}"
+                                 Style="{StaticResource ModernListBox}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border Grid.Column="0" Width="44" Height="44"
+                                                CornerRadius="22" Margin="0,0,14,0" VerticalAlignment="Center">
+                                            <Border.Background>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                    <GradientStop Color="#0A1A2A" Offset="0"/>
+                                                    <GradientStop Color="#1A1A2E" Offset="1"/>
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                            <TextBlock Text="👤" FontSize="22"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding DisplayNume}" Foreground="White"
+                                                       FontWeight="SemiBold" FontSize="13" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding DisplayDetalii}"
+                                                       Foreground="{StaticResource TextSecondary}"
+                                                       FontSize="11" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal"
+                                                    VerticalAlignment="Center" Margin="10,0,0,0">
+                                            <Border VerticalAlignment="Center"
+                                                    CornerRadius="12" Padding="10,4" Margin="0,0,8,0">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Background"      Value="#0F2A1F"/>
+                                                        <Setter Property="BorderBrush"     Value="#1A5A3A"/>
+                                                        <Setter Property="BorderThickness" Value="1"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Stare}" Value="Inactiv">
+                                                                <Setter Property="Background"  Value="#2A1A0A"/>
+                                                                <Setter Property="BorderBrush" Value="#6A3A1A"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Stare}" Value="VIP">
+                                                                <Setter Property="Background"  Value="#1A0A2A"/>
+                                                                <Setter Property="BorderBrush" Value="#6A1A8A"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <TextBlock Text="{Binding DisplayStare}" FontSize="11" FontWeight="SemiBold">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="{StaticResource SuccessColor}"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Stare}" Value="Inactiv">
+                                                                    <Setter Property="Foreground" Value="#FFA040"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Stare}" Value="VIP">
+                                                                    <Setter Property="Foreground" Value="#C080FF"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Border>
+
+                                            <Button Content="✏ Editează"
+                                                    Style="{StaticResource EditItemButton}"
+                                                    Tag="{Binding Nume}"
+                                                    Click="OnEditeazaPersoana"
+                                                    Margin="0,0,6,0" VerticalAlignment="Center"/>
+
+                                            <Button Content="🗑 Șterge"
+                                                    Style="{StaticResource DeleteItemButton}"
+                                                    Tag="{Binding Nume}"
+                                                    Click="OnStergePersoana"
+                                                    VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <Border x:Name="BdrPersoaneGoale" Visibility="Collapsed"
+                                Background="{StaticResource BgCard}"
+                                BorderBrush="{StaticResource BorderSubtle}"
+                                BorderThickness="1" CornerRadius="12">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="👤" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                                <TextBlock Text="Nicio persoană înregistrată" Foreground="White"
+                                           FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Adaugă prima persoană folosind formularul de mai sus"
+                                           Foreground="{StaticResource TextSecondary}" FontSize="12"
+                                           HorizontalAlignment="Center" Margin="0,6,0,0"
+                                           TextWrapping="Wrap" TextAlignment="Center" MaxWidth="280"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Grid>
+
                 <Border x:Name="TabEditare" Visibility="Collapsed"
                         Margin="24,16,24,16"
                         Background="{StaticResource BgCard}"
@@ -1260,10 +1465,10 @@
                                                   Checked="ChkEditImprumutat_Changed"
                                                   Unchecked="ChkEditImprumutat_Changed"/>
                                         <StackPanel x:Name="PanelEditNumeImprumutat" Visibility="Collapsed" Margin="0,12,0,0">
-                                            <Label x:Name="LblEditNumeImprumutat" Content="Nume persoană" Style="{StaticResource FieldLabel}"/>
-                                            <TextBox x:Name="TxtEditNumeImprumutat" Style="{StaticResource ModernTextBox}"/>
+                                            <Label x:Name="LblEditNumeImprumutat" Content="Persoană" Style="{StaticResource FieldLabel}"/>
+                                            <ComboBox x:Name="CmbEditNumeImprumutat" Style="{StaticResource ModernComboBox}"/>
                                             <TextBlock x:Name="TbErrEditNumeImprumutat"
-                                                       Text="Introduceți numele persoanei!"
+                                                       Text="Selectați o persoană din listă!"
                                                        FontSize="10" Foreground="{StaticResource ErrorColor}"
                                                        Margin="2,3,0,0" Visibility="Collapsed"/>
                                         </StackPanel>
