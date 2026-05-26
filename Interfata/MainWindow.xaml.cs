@@ -80,7 +80,10 @@ namespace Interfata
         private enum Tab { Adauga, Colectie, Imprumutat, Editare, Persoane }
         private Tab _tabCurent = Tab.Adauga;
 
-        private string? _titluOriginalEditat = null;
+        private string?   _titluOriginalEditat = null;
+        private Melodie[]? _melodiiImportate   = null;
+
+        private readonly VinylFormViewModel _vmVinyl = new VinylFormViewModel();
 
         private readonly PersoneViewModel _vmPersoane = new PersoneViewModel();
         private string? _numeOriginalEditat = null;
@@ -105,6 +108,7 @@ namespace Interfata
         {
             InitializeComponent();
             TabPersoane.DataContext = _vmPersoane;
+            TabAdauga.DataContext   = _vmVinyl;
             IncarcaDate();
             ActualizeazaBadge();
         }
@@ -468,23 +472,6 @@ namespace Interfata
         private int ValideazaDateVinyl()
         {
             int cod = ERR_OK;
-            int anMaxim = DateTime.Now.Year;
-
-            string artist = TxtArtist.Text.Trim();
-            if (string.IsNullOrEmpty(artist)) cod |= ERR_ARTIST_GOL;
-            else if (artist.Length > MAX_ARTIST) cod |= ERR_ARTIST_LUNG;
-
-            string titlu = TxtTitlu.Text.Trim();
-            if (string.IsNullOrEmpty(titlu)) cod |= ERR_TITLU_GOL;
-            else if (titlu.Length > MAX_TITLU) cod |= ERR_TITLU_LUNG;
-
-            if (!int.TryParse(TxtAn.Text.Trim(), out int an) || an < AN_MIN || an > anMaxim)
-                cod |= ERR_AN_INVALID;
-
-            if (!float.TryParse(TxtPret.Text.Trim(),
-                    NumberStyles.Float, CultureInfo.InvariantCulture, out float pret)
-                || pret < 0 || pret > PRET_MAX)
-                cod |= ERR_PRET_INVALID;
 
             if (CitesteGenuri() == 0) cod |= ERR_GEN_NESET;
             if (CitesteTagComboBox(CmbFormat) == 0) cod |= ERR_FORMAT_NESET;
@@ -543,28 +530,6 @@ namespace Interfata
 
         private void AplicaEroriUI(int cod)
         {
-            int anMaxim = DateTime.Now.Year;
-
-            if ((cod & ERR_ARTIST_GOL) != 0)
-            { TbErrArtist.Text = "Câmpul Artist este obligatoriu!"; AfiseazaMesajEroare(TbErrArtist, LblArtist); }
-            else if ((cod & ERR_ARTIST_LUNG) != 0)
-            { TbErrArtist.Text = $"Artistul nu poate depăși {MAX_ARTIST} caractere!"; AfiseazaMesajEroare(TbErrArtist, LblArtist); }
-            else AscundeMesajEroare(TbErrArtist, LblArtist);
-
-            if ((cod & ERR_TITLU_GOL) != 0)
-            { TbErrTitlu.Text = "Câmpul Titlu este obligatoriu!"; AfiseazaMesajEroare(TbErrTitlu, LblTitlu); }
-            else if ((cod & ERR_TITLU_LUNG) != 0)
-            { TbErrTitlu.Text = $"Titlul nu poate depăși {MAX_TITLU} caractere!"; AfiseazaMesajEroare(TbErrTitlu, LblTitlu); }
-            else AscundeMesajEroare(TbErrTitlu, LblTitlu);
-
-            if ((cod & ERR_AN_INVALID) != 0)
-            { TbErrAn.Text = $"Introduceți un an valid ({AN_MIN}–{anMaxim})!"; AfiseazaMesajEroare(TbErrAn, LblAn); }
-            else AscundeMesajEroare(TbErrAn, LblAn);
-
-            if ((cod & ERR_PRET_INVALID) != 0)
-            { TbErrPret.Text = $"Preț valid: 0–{PRET_MAX}, format 12.50!"; AfiseazaMesajEroare(TbErrPret, LblPret); }
-            else AscundeMesajEroare(TbErrPret, LblPret);
-
             if ((cod & ERR_GEN_NESET) != 0) AfiseazaMesajEroare(TbErrGen, LblGen);
             else AscundeMesajEroare(TbErrGen, LblGen);
             if ((cod & ERR_FORMAT_NESET) != 0) AfiseazaMesajEroare(TbErrFormat, LblFormat);
@@ -625,25 +590,32 @@ namespace Interfata
         {
             TbMesajSucces.Visibility = Visibility.Collapsed;
 
+            // Marchează toate câmpurile ca atinse și forțează validarea
+            _vmVinyl.MarkAllDirty();
+            TxtArtist.GetBindingExpression(System.Windows.Controls.TextBox.TextProperty)?.UpdateSource();
+            TxtTitlu.GetBindingExpression(System.Windows.Controls.TextBox.TextProperty)?.UpdateSource();
+            TxtAn.GetBindingExpression(System.Windows.Controls.TextBox.TextProperty)?.UpdateSource();
+            TxtPret.GetBindingExpression(System.Windows.Controls.TextBox.TextProperty)?.UpdateSource();
+
             int cod = ValideazaDateVinyl();
             AplicaEroriUI(cod);
-            if (cod != ERR_OK) return;
+            if (!_vmVinyl.EsteValid || cod != ERR_OK) return;
 
-            int.TryParse(TxtAn.Text.Trim(), out int an);
-            float.TryParse(TxtPret.Text.Trim(),
+            int.TryParse(_vmVinyl.An.Trim(), out int an);
+            float.TryParse(_vmVinyl.Pret.Trim(),
                            NumberStyles.Float, CultureInfo.InvariantCulture, out float pret);
 
             var vinyl = new Vinyl
             {
-                Artist = TxtArtist.Text.Trim(),
-                Titlu = TxtTitlu.Text.Trim(),
+                Artist = _vmVinyl.Artist.Trim(),
+                Titlu  = _vmVinyl.Titlu.Trim(),
                 An_Lansare = an,
                 Pret = pret,
                 Gen = (GenMuzical)CitesteGenuri(),
                 Format = (FormatVinyl)CitesteTagComboBox(CmbFormat),
                 CodConditie = CitesteTagComboBox(CmbConditie),
                 DataAchizitie = DpDataAchizitie.SelectedDate,
-                Melodii = new Melodie[0]
+                Melodii = _melodiiImportate ?? new Melodie[0]
             };
 
             if (ChkImprumutat.IsChecked == true)
@@ -658,6 +630,54 @@ namespace Interfata
             GoliesteCampuri();
         }
 
+        private async void OnImportaTracklist(object sender, RoutedEventArgs e)
+        {
+            string artist = TxtArtist.Text.Trim();
+            string titlu  = TxtTitlu.Text.Trim();
+
+            if (string.IsNullOrEmpty(artist) || string.IsNullOrEmpty(titlu))
+            {
+                TbImportStatus.Text       = "Completați câmpurile Artist și Titlu mai întâi.";
+                TbImportStatus.Foreground = new SolidColorBrush(Color.FromRgb(255, 107, 107));
+                TbImportStatus.Visibility = Visibility.Visible;
+                return;
+            }
+
+            int.TryParse(TxtAn.Text.Trim(), out int an);
+
+            BtnImportTracklist.IsEnabled  = false;
+            TbImportStatus.Text           = "Se caută pe Discogs…";
+            TbImportStatus.Foreground     = new SolidColorBrush(Color.FromRgb(144, 144, 176));
+            TbImportStatus.Visibility     = Visibility.Visible;
+
+            try
+            {
+                _melodiiImportate = await DiscogsService.ImporteazaTracklist(artist, titlu, an);
+
+                if (_melodiiImportate.Length > 0)
+                {
+                    TbImportStatus.Text       = $"✓  {_melodiiImportate.Length} melodii importate";
+                    TbImportStatus.Foreground = new SolidColorBrush(Color.FromRgb(74, 222, 128));
+                }
+                else
+                {
+                    _melodiiImportate         = null;
+                    TbImportStatus.Text       = "Nu s-a găsit niciun rezultat pe Discogs.";
+                    TbImportStatus.Foreground = new SolidColorBrush(Color.FromRgb(255, 107, 107));
+                }
+            }
+            catch
+            {
+                _melodiiImportate         = null;
+                TbImportStatus.Text       = "Eroare la conectarea cu Discogs.";
+                TbImportStatus.Foreground = new SolidColorBrush(Color.FromRgb(255, 107, 107));
+            }
+            finally
+            {
+                BtnImportTracklist.IsEnabled = true;
+            }
+        }
+
         private void OnReset(object sender, RoutedEventArgs e)
         {
             GoliesteCampuri();
@@ -667,8 +687,17 @@ namespace Interfata
 
         private void GoliesteCampuri()
         {
-            TxtArtist.Text = TxtTitlu.Text = TxtAn.Text = TxtPret.Text = string.Empty;
+            _vmVinyl.Reset();
+
+            // Curăță erorile de validare afișate prin binding (formularul gol nu trebuie să arate erori)
+            Validation.ClearInvalid(TxtArtist.GetBindingExpression(System.Windows.Controls.TextBox.TextProperty));
+            Validation.ClearInvalid(TxtTitlu.GetBindingExpression(System.Windows.Controls.TextBox.TextProperty));
+            Validation.ClearInvalid(TxtAn.GetBindingExpression(System.Windows.Controls.TextBox.TextProperty));
+            Validation.ClearInvalid(TxtPret.GetBindingExpression(System.Windows.Controls.TextBox.TextProperty));
+
             CmbNumeImprumutat.SelectedIndex = -1;
+            _melodiiImportate = null;
+            TbImportStatus.Visibility = Visibility.Collapsed;
 
             ChkRock.IsChecked = ChkJazz.IsChecked = ChkPop.IsChecked = ChkBlues.IsChecked =
             ChkElectronic.IsChecked = ChkHipHop.IsChecked = ChkClasic.IsChecked =
@@ -682,10 +711,6 @@ namespace Interfata
 
         private void AscundeTotiErorii()
         {
-            AscundeMesajEroare(TbErrArtist, LblArtist);
-            AscundeMesajEroare(TbErrTitlu, LblTitlu);
-            AscundeMesajEroare(TbErrAn, LblAn);
-            AscundeMesajEroare(TbErrPret, LblPret);
             AscundeMesajEroare(TbErrGen, LblGen);
             AscundeMesajEroare(TbErrFormat, LblFormat);
             AscundeMesajEroare(TbErrConditie, LblConditie);

@@ -52,6 +52,9 @@
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="root" Property="BorderBrush" Value="#4A4A70"/>
                             </Trigger>
+                            <Trigger Property="Validation.HasError" Value="True">
+                                <Setter TargetName="root" Property="BorderBrush" Value="{StaticResource ErrorColor}"/>
+                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -761,18 +764,64 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Grid.Column="0">
-                                        <Label x:Name="LblArtist" Content="Artist" Style="{StaticResource FieldLabel}"/>
-                                        <TextBox x:Name="TxtArtist" Style="{StaticResource ModernTextBox}"/>
+                                        <Label x:Name="LblArtist" Content="Artist">
+                                            <Label.Style>
+                                                <Style TargetType="Label" BasedOn="{StaticResource FieldLabel}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding (Validation.HasError), ElementName=TxtArtist}" Value="True">
+                                                            <Setter Property="Foreground" Value="{StaticResource ErrorColor}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Label.Style>
+                                        </Label>
+                                        <TextBox x:Name="TxtArtist" Style="{StaticResource ModernTextBox}"
+                                                 Text="{Binding Artist, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
                                         <TextBlock x:Name="TbErrArtist" FontSize="10"
                                                    Foreground="{StaticResource ErrorColor}"
-                                                   Margin="2,3,0,0" Visibility="Collapsed" TextWrapping="Wrap"/>
+                                                   Margin="2,3,0,0" TextWrapping="Wrap"
+                                                   Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=TxtArtist}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding (Validation.HasError), ElementName=TxtArtist}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     </StackPanel>
                                     <StackPanel Grid.Column="2">
-                                        <Label x:Name="LblTitlu" Content="Titlu album" Style="{StaticResource FieldLabel}"/>
-                                        <TextBox x:Name="TxtTitlu" Style="{StaticResource ModernTextBox}"/>
+                                        <Label x:Name="LblTitlu" Content="Titlu album">
+                                            <Label.Style>
+                                                <Style TargetType="Label" BasedOn="{StaticResource FieldLabel}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding (Validation.HasError), ElementName=TxtTitlu}" Value="True">
+                                                            <Setter Property="Foreground" Value="{StaticResource ErrorColor}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Label.Style>
+                                        </Label>
+                                        <TextBox x:Name="TxtTitlu" Style="{StaticResource ModernTextBox}"
+                                                 Text="{Binding Titlu, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
                                         <TextBlock x:Name="TbErrTitlu" FontSize="10"
                                                    Foreground="{StaticResource ErrorColor}"
-                                                   Margin="2,3,0,0" Visibility="Collapsed" TextWrapping="Wrap"/>
+                                                   Margin="2,3,0,0" TextWrapping="Wrap"
+                                                   Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=TxtTitlu}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding (Validation.HasError), ElementName=TxtTitlu}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     </StackPanel>
                                 </Grid>
 
@@ -783,20 +832,82 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Grid.Column="0">
-                                        <Label x:Name="LblAn" Content="An lansare" Style="{StaticResource FieldLabel}"/>
-                                        <TextBox x:Name="TxtAn" Style="{StaticResource ModernTextBox}"/>
+                                        <Label x:Name="LblAn" Content="An lansare">
+                                            <Label.Style>
+                                                <Style TargetType="Label" BasedOn="{StaticResource FieldLabel}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding (Validation.HasError), ElementName=TxtAn}" Value="True">
+                                                            <Setter Property="Foreground" Value="{StaticResource ErrorColor}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Label.Style>
+                                        </Label>
+                                        <TextBox x:Name="TxtAn" Style="{StaticResource ModernTextBox}"
+                                                 Text="{Binding An, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
                                         <TextBlock x:Name="TbErrAn" FontSize="10"
                                                    Foreground="{StaticResource ErrorColor}"
-                                                   Margin="2,3,0,0" Visibility="Collapsed" TextWrapping="Wrap"/>
+                                                   Margin="2,3,0,0" TextWrapping="Wrap"
+                                                   Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=TxtAn}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding (Validation.HasError), ElementName=TxtAn}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     </StackPanel>
                                     <StackPanel Grid.Column="2">
-                                        <Label x:Name="LblPret" Content="Preț (RON)" Style="{StaticResource FieldLabel}"/>
-                                        <TextBox x:Name="TxtPret" Style="{StaticResource ModernTextBox}"/>
+                                        <Label x:Name="LblPret" Content="Preț (RON)">
+                                            <Label.Style>
+                                                <Style TargetType="Label" BasedOn="{StaticResource FieldLabel}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding (Validation.HasError), ElementName=TxtPret}" Value="True">
+                                                            <Setter Property="Foreground" Value="{StaticResource ErrorColor}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Label.Style>
+                                        </Label>
+                                        <TextBox x:Name="TxtPret" Style="{StaticResource ModernTextBox}"
+                                                 Text="{Binding Pret, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
                                         <TextBlock x:Name="TbErrPret" FontSize="10"
                                                    Foreground="{StaticResource ErrorColor}"
-                                                   Margin="2,3,0,0" Visibility="Collapsed" TextWrapping="Wrap"/>
+                                                   Margin="2,3,0,0" TextWrapping="Wrap"
+                                                   Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=TxtPret}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding (Validation.HasError), ElementName=TxtPret}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     </StackPanel>
                                 </Grid>
+
+                                <Border Background="#12121F" BorderBrush="{StaticResource BorderSubtle}"
+                                        BorderThickness="1" CornerRadius="8" Padding="12,10" Margin="0,0,0,14">
+                                    <DockPanel>
+                                        <Button x:Name="BtnImportTracklist"
+                                                DockPanel.Dock="Left"
+                                                Content="♪  Importă Tracklist"
+                                                Style="{StaticResource SecondaryButton}"
+                                                Width="170" Height="34"
+                                                Click="OnImportaTracklist"/>
+                                        <TextBlock x:Name="TbImportStatus"
+                                                   VerticalAlignment="Center" Margin="14,0,0,0"
+                                                   FontSize="11" TextWrapping="Wrap"
+                                                   Visibility="Collapsed"/>
+                                    </DockPanel>
+                                </Border>
 
                                 <Border Background="#12121F" BorderBrush="{StaticResource BorderSubtle}"
                                         BorderThickness="1" CornerRadius="8" Padding="16,12" Margin="0,0,0,14">
