@@ -1,70 +1,70 @@
-# Vinyl Vibes — Sistem de Gestiune Viniluri
+# Vinyl Vibes — Vinyl Record Management System
 
-O aplicație desktop C# cu interfață grafică WPF destinată colecționarilor de discuri de vinil.
-Permite organizarea colecției, monitorizarea stării fizice a discurilor, gestionarea împrumuturilor, editarea/ștergerea înregistrărilor și importul automat al tracklist-ului din Discogs API.
-
----
-
-## Funcționalități
-
-- **Meniu lateral** — bară de navigare pliabilă (50 px ↔ 200 px) cu pictograme și text
-- **Tab-uri de navigare** — Adaugă · Colecție · Împrumutate · Persoane · Editare
-- **Adăugare vinyluri** — formular cu validare completă: artist, titlu, an, preț, gen muzical (multi-select cu CheckBox), format și condiție disc (ComboBox), dată achiziție
-- **Import tracklist din Discogs** — buton de import asincron care caută discul pe [Discogs API](https://www.discogs.com/developers/) și populează automat lista de melodii
-- **Împrumuturi** — marcare disc ca împrumutat cu selecție persoană din listă (ComboBox populat din `persoane.txt`)
-- **Editare vinyluri** — formularul de editare pre-populat cu datele existente, salvare cu re-validare
-- **Ștergere vinyluri** — confirmare dialog înainte de ștergere permanentă
-- **Căutare în timp real** — filtrare listă după artist sau titlu, cu actualizare la fiecare tastă
-- **Vizualizare colecție** — DataGrid cu detalii complete per disc
-- **Vizualizare împrumuturi** — tab separat cu lista discurilor împrumutate
-- **Gestiune persoane** — tab dedicat cu CRUD complet: adăugare, editare, ștergere; câmpuri: nume, contact, rol, stare (Activ / Inactiv / VIP)
-- **Sistem de grading** — condiție disc pe scara 1–8 (Poor → Mint)
-- **Persistență** — datele sunt salvate automat în fișiere text (`vinyluri.txt`, `persoane.txt`) în directorul executabilului
-- **Validare prin WPF binding (IDataErrorInfo)** — bordură roșie per câmp, mesaj de eroare afișat sub control, fără erori la deschiderea aplicației
+A C# desktop application with a WPF graphical interface designed for vinyl record collectors.
+It allows users to organize their collections, track the physical condition of records, manage loans, edit and delete entries, and automatically import tracklists using the Discogs API.
 
 ---
 
-## Controale WPF Utilizate
+## Features
 
-| Control | Utilizare | Locație |
-|---------|-----------|---------|
-| **DataGrid** | Afișare colecție vinyluri | Tab Colecție |
-| **ListBox** | Lista împrumuturi, lista persoane | Tab Împrumutate, Tab Persoane |
-| **ComboBox** | Selecție Format disc, Condiție disc, Persoană împrumutată, Rol și Stare persoană | Formular Adaugă, Formular Editare, Tab Persoane |
-| **CheckBox** | Selecție multiplă genuri muzicale (`[Flags]`) + marcare disc împrumutat | Formular Adaugă, Formular Editare |
-| **DatePicker** | Selectare data achiziției discului (opțional, template dark custom) | Formular Adaugă, Formular Editare |
-| **TextBox** | Input text: artist, titlu, an, preț, căutare, date persoană | Formulare + bara de căutare |
-| **Button** | Acțiuni: adaugă, reset, editează, șterge, hamburger, import Discogs | Toate secțiunile |
+- **Collapsible sidebar** — expandable navigation bar (50 px ↔ 200 px) with icons and text
+- **Navigation tabs** — Add · Collection · Borrowed · People · Edit
+- **Add vinyl records** — fully validated form for artist, title, year, price, music genres (multi-select CheckBox), record format and condition (ComboBox), and purchase date
+- **Discogs tracklist import** — asynchronous import button that searches for a record using the [Discogs API](https://www.discogs.com/developers/) and automatically populates its tracklist
+- **Loans** — mark a record as borrowed and select a person from a list (ComboBox populated from `persoane.txt`)
+- **Edit vinyl records** — editing form pre-populated with existing data; changes are revalidated before saving
+- **Delete vinyl records** — confirmation dialog before permanent deletion
+- **Real-time search** — filter the list by artist or title, updating with every keystroke
+- **Collection view** — DataGrid with complete details for each record
+- **Loans view** — separate tab listing borrowed records
+- **People management** — dedicated tab with full CRUD operations: add, edit, and delete; fields include name, contact, role, and status (Active / Inactive / VIP)
+- **Grading system** — record condition on a scale of 1–8 (Poor → Mint)
+- **Persistence** — data is automatically saved to text files (`vinyluri.txt`, `persoane.txt`) in the executable directory
+- **WPF binding validation (`IDataErrorInfo`)** — red border around invalid fields and an error message below the control, with no validation errors when the application first opens
 
 ---
 
-## Arhitectura Soluției
+## WPF Controls Used
 
-```
+| Control | Purpose | Location |
+|---------|---------|----------|
+| **DataGrid** | Display the vinyl record collection | Collection tab |
+| **ListBox** | Display loans and people lists | Borrowed tab, People tab |
+| **ComboBox** | Select record format, record condition, borrower, and a person's role and status | Add form, Edit form, People tab |
+| **CheckBox** | Select multiple music genres (`[Flags]`) and mark a record as borrowed | Add form, Edit form |
+| **DatePicker** | Select the optional record purchase date (custom dark template) | Add form, Edit form |
+| **TextBox** | Enter artist, title, year, price, search terms, and personal information | Forms and search bar |
+| **Button** | Add, reset, edit, delete, toggle the sidebar, and import from Discogs | All sections |
+
+---
+
+## Solution Architecture
+
+```text
 Vinyl.slnx
 │
-├── LibrarieModele/              # Nivelul Model (entități de domeniu)
+├── LibrarieModele/              # Model layer (domain entities)
 │   ├── Enums.cs                 # GenMuzical [Flags], FormatVinyl, RolPersoana, StareMembru
-│   ├── Melodie.cs               # Model melodie + FromLine() / ToLine()
-│   ├── Persoana.cs              # Model persoană + FromLine() / ToLine()
-│   └── Vinyl.cs                 # Model vinyl + TryFromLines() / ToLines()
+│   ├── Melodie.cs               # Track model + FromLine() / ToLine()
+│   ├── Persoana.cs              # Person model + FromLine() / ToLine()
+│   └── Vinyl.cs                 # Vinyl model + TryFromLines() / ToLines()
 │
-├── NivelStocareDate/            # Nivelul de Stocare (persistență fișiere)
+├── NivelStocareDate/            # Storage layer (file persistence)
 │   └── GestiuneDate.cs          # GestiuneDate<T> · RepoVinyluri · RepoPersone
 │
-└── Interfata/                   # Nivelul Prezentare (WPF — MVVM)
-    ├── MainWindow.xaml           # UI: stiluri, meniu hamburger, tab-uri, formulare
-    ├── MainWindow.xaml.cs        # Logica de prezentare, navigare, CRUD
-    ├── VinylFormViewModel.cs     # ViewModel formular adăugare (INotifyPropertyChanged,
-    │                             #   IDataErrorInfo, HashSet<string> _dirty)
-    └── DiscogsService.cs         # Serviciu static REST → Discogs API (HttpClient, async/await)
+└── Interfata/                   # Presentation layer (WPF — MVVM)
+    ├── MainWindow.xaml          # UI: styles, hamburger menu, tabs, forms
+    ├── MainWindow.xaml.cs       # Presentation logic, navigation, CRUD
+    ├── VinylFormViewModel.cs    # Add form ViewModel (INotifyPropertyChanged,
+    │                            #   IDataErrorInfo, HashSet<string> _dirty)
+    └── DiscogsService.cs        # Static REST service → Discogs API (HttpClient, async/await)
 ```
 
 ---
 
-## Validare și Binding (MVVM)
+## Validation and Binding (MVVM)
 
-Formularul de adăugare folosește binding bidirecțional WPF către `VinylFormViewModel`:
+The add form uses two-way WPF binding to `VinylFormViewModel`:
 
 ```xml
 <TextBox x:Name="TxtArtist"
@@ -73,49 +73,53 @@ Formularul de adăugare folosește binding bidirecțional WPF către `VinylFormV
                 ValidatesOnDataErrors=True}" />
 ```
 
-- **UI → ViewModel**: `UpdateSourceTrigger=PropertyChanged` — ViewModel primește valoarea la fiecare tastă
-- **ViewModel → UI**: `INotifyPropertyChanged` — `OnPropertyChanged()` actualizează automat controlul
-- **Validare**: `IDataErrorInfo.this[propertyName]` — WPF citește eroarea și aplică bordura roșie
-- **Fără erori la startup**: `HashSet<string> _dirty` — validarea se declanșează doar pentru câmpurile atinse de utilizator
+- **UI → ViewModel:** `UpdateSourceTrigger=PropertyChanged` — the ViewModel receives updated values with every keystroke
+- **ViewModel → UI:** `INotifyPropertyChanged` — `OnPropertyChanged()` automatically updates the control
+- **Validation:** `IDataErrorInfo.this[propertyName]` — WPF reads the error and applies a red border
+- **No startup errors:** `HashSet<string> _dirty` — validation is triggered only for fields the user has interacted with
 
 ---
 
-## Tehnologii
+## Technologies
 
-| | |
-|---|---|
-| Limbaj | C# (.NET 10) |
+| Component | Technology |
+|-----------|------------|
+| Language | C# (.NET 10) |
 | UI | WPF (Windows Presentation Foundation) |
-| Arhitectură | Layered + MVVM (INotifyPropertyChanged, IDataErrorInfo) |
-| Stocare | Fișiere text plain (`vinyluri.txt`, `persoane.txt`) |
-| API extern | [Discogs API v2.0](https://www.discogs.com/developers/) — import tracklist |
-| HTTP | `HttpClient` singleton + `async/await` + `System.Text.Json` |
+| Architecture | Layered + MVVM (`INotifyPropertyChanged`, `IDataErrorInfo`) |
+| Storage | Plain text files (`vinyluri.txt`, `persoane.txt`) |
+| External API | [Discogs API v2.0](https://www.discogs.com/developers/) — tracklist import |
+| HTTP | Singleton `HttpClient` + `async/await` + `System.Text.Json` |
 
 ---
 
 ## Build & Run
 
 ```powershell
-# Rulare aplicație WPF
+# Run the WPF application
 dotnet run --project Interfata\Interfata.csproj
 
-# Doar compilare
+# Build only
 dotnet build "Vinyl.slnx"
 ```
 
-> Fișierele de date (`vinyluri.txt`, `persoane.txt`) sunt create/citite automat din directorul executabilului (`bin\Debug\net10.0-windows\`).
+> Data files (`vinyluri.txt`, `persoane.txt`) are automatically created/read from the executable directory (`bin\Debug\net10.0-windows\`).
 
 ---
 
-## Structura Fișierelor de Date
+## Data File Structure
 
 **`vinyluri.txt`**
-```
+
+```text
 VINYL|<Titlu>|<Artist>|<An>|<Pret>|<CodConditie>|<Gen(int)>|<Format(int)>|<Imprumutat(0/1)>|<NumeImprumutat>|<CaleSnippet>|<DataAchizitie(yyyy-MM-dd)>
 MELODIE|<Titlu>|<Featuring>|<DurataMinute>
 ```
 
 **`persoane.txt`**
-```
+
+```text
 PERSOANA|<Nume>|<Contact>|<Rol>|<Stare>|<disc1;disc2;...>
 ```
+
+> Field names in the data examples are kept unchanged to match the application's existing serialization format.
